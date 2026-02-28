@@ -62,11 +62,33 @@ cursor: pointer; background: white; color: #999; line-height: 1.6;
 .mode-btn.active rt { color: rgba(255,255,255,0.8); }
 
 .line-select {
+width: 100%; margin-bottom: 16px;
+}
+.company-group {
+margin-bottom: 14px;
+}
+.company-header {
+display: -webkit-flex; display: flex;
+-webkit-align-items: center; align-items: center;
+gap: 8px; padding: 10px 14px; margin-bottom: 8px;
+border-radius: 14px; color: white; font-weight: 900; font-size: 15px;
+line-height: 1.6; cursor: pointer; border: none; width: 100%;
+font-family: inherit;
+box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+-webkit-user-select: none; user-select: none;
+}
+.company-header rt { font-size: 0.5em; color: rgba(255,255,255,0.8); }
+.company-header .company-icon { font-size: 22px; }
+.company-header .company-arrow { margin-left: auto; font-size: 14px; transition: transform 0.2s; }
+.company-header .company-arrow.open { transform: rotate(90deg); }
+.company-lines {
 display: -webkit-flex; display: flex;
 -webkit-flex-wrap: wrap; flex-wrap: wrap;
-gap: 8px; margin-bottom: 16px; width: 100%;
+gap: 8px; padding: 0 4px;
 -webkit-justify-content: center; justify-content: center;
+overflow: hidden; transition: max-height 0.3s ease, opacity 0.3s ease;
 }
+.company-lines.collapsed { max-height: 0; opacity: 0; padding: 0; margin: 0; }
 .line-btn {
 width: 30%; min-width: 100px;
 border: none; border-radius: 14px; padding: 10px 4px;
@@ -77,7 +99,7 @@ line-height: 1.6;
 }
 .line-btn .line-icon { font-size: 22px; display: block; margin-bottom: 2px; }
 .line-btn .line-name { display: block; font-size: 12px; line-height: 1.6; }
-.line-btn .line-company { display: block; font-size: 10px; opacity: 0.85; margin-top: 2px; line-height: 1.6; }
+.line-btn .line-company { display: none; }
 .line-btn rt { font-size: 0.5em; color: rgba(255,255,255,0.85); }
 
 /* ===== Route Map ===== */
@@ -361,7 +383,7 @@ function R(k,f){ return '<ruby>'+k+'<rt>'+f+'</rt></ruby>'; }
 
 var LINES = [
   {
-    id:'osaka_loop', isLoop:true,
+    id:'osaka_loop', isLoop:true, group:'jr',
     nameHtml: R('大阪','おおさか')+R('環状線','かんじょうせん'),
     companyHtml: 'JR'+R('西日本','にしにほん'),
     color:'#E60012', icon:'🔴',
@@ -375,7 +397,7 @@ var LINES = [
     ]
   },
   {
-    id:'jr_kyoto',
+    id:'jr_kyoto', group:'jr',
     nameHtml:'JR'+R('京都線','きょうとせん'),
     companyHtml:'JR'+R('西日本','にしにほん'),
     color:'#0068B7', icon:'🔵',
@@ -388,7 +410,7 @@ var LINES = [
     ]
   },
   {
-    id:'jr_kobe',
+    id:'jr_kobe', group:'jr',
     nameHtml:'JR'+R('神戸線','こうべせん'),
     companyHtml:'JR'+R('西日本','にしにほん'),
     color:'#0068B7', icon:'💙',
@@ -401,7 +423,7 @@ var LINES = [
     ]
   },
   {
-    id:'midosuji',
+    id:'midosuji', group:'metro',
     nameHtml:R('御堂筋線','みどうすじせん'),
     companyHtml:R('大阪','おおさか')+'メトロ',
     color:'#E5171F', icon:'🔴',
@@ -415,7 +437,7 @@ var LINES = [
     ]
   },
   {
-    id:'hankyu_arashiyama',
+    id:'hankyu_arashiyama', group:'hankyu',
     nameHtml:R('阪急','はんきゅう')+R('嵐山線','あらしやません'),
     companyHtml:R('阪急','はんきゅう')+R('電鉄','でんてつ'),
     color:'#8B4513', icon:'🍁',
@@ -424,7 +446,7 @@ var LINES = [
     ]
   },
   {
-    id:'hankyu_kyoto',
+    id:'hankyu_kyoto', group:'hankyu',
     nameHtml:R('阪急','はんきゅう')+R('京都線','きょうとせん'),
     companyHtml:R('阪急','はんきゅう')+R('電鉄','でんてつ'),
     color:'#814721', icon:'🚃',
@@ -440,7 +462,7 @@ var LINES = [
     ]
   },
   {
-    id:'kintetsu_nara',
+    id:'kintetsu_nara', group:'kintetsu',
     nameHtml:R('近鉄','きんてつ')+R('奈良線','ならせん'),
     companyHtml:R('近鉄','きんてつ')+R('電鉄','でんてつ'),
     color:'#CC4400', icon:'🦌',
@@ -454,7 +476,7 @@ var LINES = [
     ]
   },
   {
-    id:'hankyu_kobe',
+    id:'hankyu_kobe', group:'hankyu',
     nameHtml:R('阪急','はんきゅう')+R('神戸線','こうべせん'),
     companyHtml:R('阪急','はんきゅう')+R('電鉄','でんてつ'),
     color:'#1E50A2', icon:'🔵',
@@ -466,7 +488,7 @@ var LINES = [
     ]
   },
   {
-    id:'hanshin_honsen',
+    id:'hanshin_honsen', group:'hanshin',
     nameHtml:R('阪神','はんしん')+R('本線','ほんせん'),
     companyHtml:R('阪神','はんしん')+R('電車','でんしゃ'),
     color:'#F58220', icon:'🐯',
@@ -484,7 +506,7 @@ var LINES = [
     ]
   },
   {
-    id:'hankyu_takarazuka',
+    id:'hankyu_takarazuka', group:'hankyu',
     nameHtml:R('阪急','はんきゅう')+R('宝塚線','たからづかせん'),
     companyHtml:R('阪急','はんきゅう')+R('電鉄','でんてつ'),
     color:'#E85298', icon:'🎀',
@@ -498,7 +520,7 @@ var LINES = [
     ]
   },
   {
-    id:'nagahori',
+    id:'nagahori', group:'metro',
     nameHtml:R('長堀鶴見緑地線','ながほりつるみりょくちせん'),
     companyHtml:R('大阪','おおさか')+'メトロ',
     color:'#A9CC51', icon:'🌿',
@@ -512,7 +534,7 @@ var LINES = [
     ]
   },
   {
-    id:'jr_takarazuka',
+    id:'jr_takarazuka', group:'jr',
     nameHtml:'JR'+R('宝塚線','たからづかせん'),
     companyHtml:'JR'+R('西日本','にしにほん'),
     color:'#FCBA03', icon:'⭐',
@@ -526,7 +548,7 @@ var LINES = [
     ]
   },
   {
-    id:'jr_tozai',
+    id:'jr_tozai', group:'jr',
     nameHtml:'JR'+R('東西線','とうざいせん'),
     companyHtml:'JR'+R('西日本','にしにほん'),
     color:'#E9546B', icon:'🌸',
@@ -537,7 +559,7 @@ var LINES = [
     ]
   },
   {
-    id:'jr_sanyo',
+    id:'jr_sanyo', group:'jr',
     nameHtml:'JR'+R('山陽本線','さんようほんせん'),
     companyHtml:'JR'+R('西日本','にしにほん'),
     color:'#2B7A2F', icon:'🏯',
@@ -551,7 +573,7 @@ var LINES = [
     ]
   },
   {
-    id:'keihan_honsen',
+    id:'keihan_honsen', group:'keihan',
     nameHtml:R('京阪','けいはん')+R('本線','ほんせん'),
     companyHtml:R('京阪','けいはん')+R('電車','でんしゃ'),
     color:'#2B4B36', icon:'🟢',
@@ -572,7 +594,7 @@ var LINES = [
     ]
   },
   {
-    id:'nankai_honsen',
+    id:'nankai_honsen', group:'nankai',
     nameHtml:R('南海','なんかい')+R('本線','ほんせん'),
     companyHtml:R('南海','なんかい')+R('電鉄','でんてつ'),
     color:'#009B3E', icon:'🟩',
@@ -594,7 +616,7 @@ var LINES = [
     ]
   },
   {
-    id:'metro_tanimachi',
+    id:'metro_tanimachi', group:'metro',
     nameHtml:R('谷町線','たにまちせん'),
     companyHtml:R('大阪','おおさか')+'メトロ',
     color:'#522886', icon:'💜',
@@ -612,7 +634,7 @@ var LINES = [
     ]
   },
   {
-    id:'metro_yotsubashi',
+    id:'metro_yotsubashi', group:'metro',
     nameHtml:R('四','よ')+'つ'+R('橋線','ばしせん'),
     companyHtml:R('大阪','おおさか')+'メトロ',
     color:'#0078C8', icon:'🔷',
@@ -624,7 +646,7 @@ var LINES = [
     ]
   },
   {
-    id:'metro_sakaisuji',
+    id:'metro_sakaisuji', group:'metro',
     nameHtml:R('堺筋線','さかいすじせん'),
     companyHtml:R('大阪','おおさか')+'メトロ',
     color:'#B6461A', icon:'🟤',
@@ -636,7 +658,7 @@ var LINES = [
     ]
   },
   {
-    id:'metro_chuo',
+    id:'metro_chuo', group:'metro',
     nameHtml:R('中央線','ちゅうおうせん'),
     companyHtml:R('大阪','おおさか')+'メトロ',
     color:'#00A84D', icon:'💚',
@@ -649,7 +671,7 @@ var LINES = [
     ]
   },
   {
-    id:'kyoto_karasuma',
+    id:'kyoto_karasuma', group:'kyoto_subway',
     nameHtml:R('烏丸線','からすません'),
     companyHtml:R('京都','きょうと')+R('市営','しえい')+R('地下鉄','ちかてつ'),
     color:'#3AAF37', icon:'🍃',
@@ -662,7 +684,7 @@ var LINES = [
     ]
   },
   {
-    id:'kobe_seishin',
+    id:'kobe_seishin', group:'kobe_subway',
     nameHtml:R('西神','せいしん')+'・'+R('山手線','やまてせん'),
     companyHtml:R('神戸','こうべ')+R('市営','しえい')+R('地下鉄','ちかてつ'),
     color:'#41A62D', icon:'🌳',
@@ -676,7 +698,7 @@ var LINES = [
     ]
   },
   {
-    id:'jr_nara',
+    id:'jr_nara', group:'jr',
     nameHtml:'JR'+R('奈良線','ならせん'),
     companyHtml:'JR'+R('西日本','にしにほん'),
     color:'#825B35', icon:'🦌',
@@ -691,7 +713,7 @@ var LINES = [
     ]
   },
   {
-    id:'osaka_higashi',
+    id:'osaka_higashi', group:'jr',
     nameHtml:'おおさか'+R('東線','ひがしせん'),
     companyHtml:'JR'+R('西日本','にしにほん'),
     color:'#00BFFF', icon:'💎',
@@ -705,7 +727,7 @@ var LINES = [
     ]
   },
   {
-    id:'jr_hanwa',
+    id:'jr_hanwa', group:'jr',
     nameHtml:'JR'+R('阪和線','はんわせん'),
     companyHtml:'JR'+R('西日本','にしにほん'),
     color:'#FF6600', icon:'🟠',
@@ -783,22 +805,70 @@ function setMode(mode) {
   buildTitleScreen();
 }
 
+var GROUPS = [
+  { id:'jr', label:'🚄 JR'+R('西日本','にしにほん'), color:'#0068B7' },
+  { id:'hankyu', label:'🚃 '+R('阪急','はんきゅう')+R('電鉄','でんてつ'), color:'#814721' },
+  { id:'hanshin', label:'🐯 '+R('阪神','はんしん')+R('電車','でんしゃ'), color:'#F58220' },
+  { id:'metro', label:'🚇 '+R('大阪','おおさか')+'メトロ', color:'#E5171F' },
+  { id:'keihan', label:'🟢 '+R('京阪','けいはん')+R('電車','でんしゃ'), color:'#2B4B36' },
+  { id:'kintetsu', label:'🦌 '+R('近鉄','きんてつ')+R('電鉄','でんてつ'), color:'#CC4400' },
+  { id:'nankai', label:'🟩 '+R('南海','なんかい')+R('電鉄','でんてつ'), color:'#009B3E' },
+  { id:'kyoto_subway', label:'🍃 '+R('京都','きょうと')+R('市営','しえい')+R('地下鉄','ちかてつ'), color:'#3AAF37' },
+  { id:'kobe_subway', label:'🌳 '+R('神戸','こうべ')+R('市営','しえい')+R('地下鉄','ちかてつ'), color:'#41A62D' }
+];
+
 function buildTitleScreen() {
   var c = document.getElementById('lineSelect');
   c.innerHTML = '';
-  for (var i = 0; i < LINES.length; i++) {
-    (function(line) {
-      var btn = document.createElement('button');
-      btn.className = 'line-btn';
-      btn.style.background = line.color;
-      btn.innerHTML = '<span class="line-icon">' + line.icon + '</span>' +
-        '<span class="line-name">' + line.nameHtml + '</span>' +
-        '<span class="line-company">' + line.companyHtml + '</span>';
-      btn.onclick = function() {
-        if (currentMode === 'quiz') startQuiz(line); else showRouteMap(line);
+
+  for (var g = 0; g < GROUPS.length; g++) {
+    (function(group) {
+      var groupLines = [];
+      for (var i = 0; i < LINES.length; i++) {
+        if (LINES[i].group === group.id) groupLines.push(LINES[i]);
+      }
+      if (groupLines.length === 0) return;
+
+      var wrap = document.createElement('div');
+      wrap.className = 'company-group';
+
+      var header = document.createElement('button');
+      header.className = 'company-header';
+      header.style.background = group.color;
+      header.innerHTML = group.label + '<span class="company-arrow open">▶</span>';
+
+      var linesDiv = document.createElement('div');
+      linesDiv.className = 'company-lines';
+
+      header.onclick = function() {
+        var arrow = header.querySelector('.company-arrow');
+        if (linesDiv.className.indexOf('collapsed') === -1) {
+          linesDiv.className = 'company-lines collapsed';
+          arrow.className = 'company-arrow';
+        } else {
+          linesDiv.className = 'company-lines';
+          arrow.className = 'company-arrow open';
+        }
       };
-      c.appendChild(btn);
-    })(LINES[i]);
+
+      for (var j = 0; j < groupLines.length; j++) {
+        (function(line) {
+          var btn = document.createElement('button');
+          btn.className = 'line-btn';
+          btn.style.background = line.color;
+          btn.innerHTML = '<span class="line-icon">' + line.icon + '</span>' +
+            '<span class="line-name">' + line.nameHtml + '</span>';
+          btn.onclick = function() {
+            if (currentMode === 'quiz') startQuiz(line); else showRouteMap(line);
+          };
+          linesDiv.appendChild(btn);
+        })(groupLines[j]);
+      }
+
+      wrap.appendChild(header);
+      wrap.appendChild(linesDiv);
+      c.appendChild(wrap);
+    })(GROUPS[g]);
   }
 }
 
