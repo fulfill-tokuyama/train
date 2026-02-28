@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>つぎのえきは？かんさい でんしゃクイズ</title>
+<style>
+  * { margin: 0; padding: 0; -webkit-box-sizing: border-box; box-sizing: border-box; }
+  html, body { width: 100%; min-height: 100%; }
+  body {
+    font-family: 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Meiryo', sans-serif;
+    background: #FFF8EC; min-height: 100vh; overflow-x: hidden;
+  }
+  ruby { ruby-align: center; }
+  rt { font-size: 0.5em; font-weight: 700; color: #999; }
+
+.sky-gradient {
+position: fixed; top: 0; left: 0; right: 0; height: 180px;
+background: -webkit-linear-gradient(top, #87CEEB 0%, #B6E3F4 60%, #FFF8EC 100%);
+background: linear-gradient(180deg, #87CEEB 0%, #B6E3F4 60%, #FFF8EC 100%);
+z-index: 0;
+}
+.ground {
+position: fixed; bottom: 0; left: 0; right: 0; height: 60px;
+background: -webkit-linear-gradient(top, #7EC850, #5BA03A);
+background: linear-gradient(to bottom, #7EC850, #5BA03A); z-index: 1;
+}
+.track {
+position: fixed; bottom: 50px; left: 0; right: 0; height: 14px;
+background: #8B6914; z-index: 2;
+}
+.app {
+position: relative; z-index: 10; max-width: 480px;
+margin: 0 auto; padding: 16px 16px 100px; min-height: 100vh;
+}
+
+/* ===== Title ===== */
+.title-screen {
+display: -webkit-flex; display: flex;
+-webkit-flex-direction: column; flex-direction: column;
+-webkit-align-items: center; align-items: center;
+-webkit-justify-content: center; justify-content: center;
+min-height: 80vh; text-align: center;
+}
+.title-logo { font-size: 22px; font-weight: 900; color: #2C1810; margin-bottom: 4px; line-height: 1.6; }
+.title-sub { font-size: 16px; font-weight: 700; margin-bottom: 4px; color: #E85D3A; }
+.title-main { font-size: 36px; font-weight: 900; margin-bottom: 16px; letter-spacing: 2px; line-height: 1.5; color: #E85D3A; }
+.title-train-emoji { font-size: 60px; margin-bottom: 12px; }
+
+.mode-toggle {
+display: -webkit-flex; display: flex;
+margin-bottom: 18px; border-radius: 14px; overflow: hidden;
+box-shadow: 0 2px 8px rgba(0,0,0,0.1); width: 100%;
+}
+.mode-btn {
+-webkit-flex: 1; flex: 1; border: none; padding: 14px 8px;
+font-family: inherit; font-size: 16px; font-weight: 900;
+cursor: pointer; background: white; color: #999; line-height: 1.6;
+}
+.mode-btn.active { background: #E85D3A; color: white; }
+.mode-btn.active rt { color: rgba(255,255,255,0.8); }
+
+.line-select {
+display: -webkit-flex; display: flex;
+-webkit-flex-wrap: wrap; flex-wrap: wrap;
+gap: 8px; margin-bottom: 16px; width: 100%;
+-webkit-justify-content: center; justify-content: center;
+}
+.line-btn {
+width: 30%; min-width: 100px;
+border: none; border-radius: 14px; padding: 10px 4px;
+font-family: inherit; font-size: 12px; font-weight: 700;
+color: white; cursor: pointer;
+box-shadow: 0 4px 0 rgba(0,0,0,0.2), 0 6px 12px rgba(0,0,0,0.15);
+line-height: 1.6;
+}
+.line-btn .line-icon { font-size: 22px; display: block; margin-bottom: 2px; }
+.line-btn .line-name { display: block; font-size: 12px; line-height: 1.6; }
+.line-btn .line-company { display: block; font-size: 10px; opacity: 0.85; margin-top: 2px; line-height: 1.6; }
+.line-btn rt { font-size: 0.5em; color: rgba(255,255,255,0.85); }
+
+/* ===== Route Map ===== */
+.routemap-header {
+display: -webkit-flex; display: flex;
+-webkit-align-items: center; align-items: center;
+-webkit-justify-content: space-between; justify-content: space-between;
+margin-bottom: 14px; padding: 10px 14px;
+background: white; border-radius: 16px;
+box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.routemap-badge {
+display: inline-block; padding: 4px 14px; border-radius: 20px;
+color: white; font-weight: 700; font-size: 13px; line-height: 1.6;
+}
+.routemap-badge rt { font-size: 0.5em; color: rgba(255,255,255,0.8); }
+.routemap-info {
+text-align: center; margin-bottom: 14px; font-size: 13px; color: #888;
+background: white; border-radius: 14px; padding: 10px 14px;
+box-shadow: 0 2px 8px rgba(0,0,0,0.06); line-height: 1.8;
+}
+.routemap-info .info-count { font-weight: 900; font-size: 20px; color: #E85D3A; }
+.route-list {
+background: white; border-radius: 20px; padding: 20px 16px;
+box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 16px;
+}
+.route-station {
+display: -webkit-flex; display: flex;
+-webkit-align-items: center; align-items: center;
+gap: 14px; padding: 6px 0;
+}
+.route-line-col {
+width: 32px;
+display: -webkit-flex; display: flex;
+-webkit-flex-direction: column; flex-direction: column;
+-webkit-align-items: center; align-items: center;
+-webkit-flex-shrink: 0; flex-shrink: 0;
+}
+.route-dot {
+width: 16px; height: 16px; border-radius: 50%;
+border: 3px solid; z-index: 2; background: white;
+-webkit-flex-shrink: 0; flex-shrink: 0;
+}
+.route-dot.terminal {
+width: 22px; height: 22px;
+box-shadow: 0 0 0 3px white, 0 0 0 5px currentColor;
+}
+.route-connector { width: 4px; height: 22px; -webkit-flex-shrink: 0; flex-shrink: 0; }
+.route-station-name { font-size: 17px; font-weight: 900; color: #2C1810; line-height: 1.5; -webkit-flex: 1; flex: 1; }
+.route-station-name rt { font-size: 0.5em; color: #999; }
+.route-station-name.terminal-name { font-size: 20px; }
+.terminal-tag {
+display: inline-block; font-size: 10px; font-weight: 700;
+padding: 2px 8px; border-radius: 8px; color: white;
+margin-left: 6px; vertical-align: middle; line-height: 1.6;
+}
+.terminal-tag rt { font-size: 0.55em; color: rgba(255,255,255,0.85); }
+.loop-tag {
+display: inline-block; font-size: 10px; font-weight: 700;
+padding: 2px 8px; border-radius: 8px; color: white;
+background: #999; margin-left: 6px; vertical-align: middle;
+}
+.station-number { font-size: 11px; color: #BBB; font-weight: 700; min-width: 22px; text-align: right; -webkit-flex-shrink: 0; flex-shrink: 0; }
+
+/* ===== Quiz ===== */
+.quiz-header {
+display: -webkit-flex; display: flex;
+-webkit-align-items: center; align-items: center;
+-webkit-justify-content: space-between; justify-content: space-between;
+margin-bottom: 12px; padding: 10px 14px;
+background: white; border-radius: 16px;
+box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.back-btn { background: none; border: none; font-size: 24px; cursor: pointer; padding: 4px; }
+.line-badge {
+display: inline-block; padding: 4px 12px; border-radius: 20px;
+color: white; font-weight: 700; font-size: 12px; line-height: 1.6;
+}
+.line-badge rt { font-size: 0.5em; color: rgba(255,255,255,0.8); }
+.score-display { font-size: 18px; font-weight: 700; color: #FFD700; }
+
+.progress-label { font-size: 13px; color: #888; margin-bottom: 10px; text-align: center; line-height: 1.6; }
+
+/* Station Flow Card */
+.flow-card {
+background: white; border-radius: 24px; padding: 20px 16px;
+margin-bottom: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+.flow-title {
+text-align: center; font-size: 14px; color: #999; margin-bottom: 14px; line-height: 1.6;
+}
+.flow-stations {
+display: -webkit-flex; display: flex;
+-webkit-flex-direction: column; flex-direction: column;
+-webkit-align-items: center; align-items: center;
+gap: 0;
+}
+.flow-item {
+text-align: center; padding: 8px 0; width: 100%;
+}
+.flow-station-name {
+font-size: 22px; font-weight: 900; color: #2C1810; line-height: 1.5;
+}
+.flow-station-name rt { font-size: 0.45em; color: #999; }
+.flow-arrow {
+font-size: 20px; color: #CCC; padding: 2px 0; display: block; text-align: center;
+}
+.flow-blank {
+display: inline-block;
+border: 4px dashed #E85D3A;
+border-radius: 16px;
+padding: 8px 32px;
+font-size: 28px; font-weight: 900;
+color: #E85D3A;
+background: #FFF5F0;
+min-width: 140px;
+}
+.flow-blank.revealed-correct {
+border-color: #4CAF50; background: #E8F5E9; color: #4CAF50;
+border-style: solid;
+}
+.flow-blank.revealed-correct rt { color: #81C784; }
+.flow-blank.revealed-wrong {
+border-color: #FF6B6B; background: #FFEBEE; color: #FF6B6B;
+border-style: solid; text-decoration: line-through;
+}
+.flow-correct-show {
+display: block; font-size: 18px; font-weight: 700; color: #4CAF50;
+margin-top: 4px;
+}
+.flow-correct-show rt { color: #81C784; }
+
+/* Answer Buttons - 2 choices */
+.answers-2 {
+display: -webkit-flex; display: flex;
+gap: 12px; margin-bottom: 14px;
+}
+.answer-btn-2 {
+-webkit-flex: 1; flex: 1;
+border: none; border-radius: 20px; padding: 18px 10px;
+font-family: inherit; font-size: 22px; font-weight: 900;
+color: #2C1810; background: white; cursor: pointer;
+box-shadow: 0 5px 0 #D0D0D0, 0 5px 15px rgba(0,0,0,0.1);
+min-height: 80px; line-height: 1.5; text-align: center;
+-webkit-transition: all 0.15s ease; transition: all 0.15s ease;
+}
+.answer-btn-2 rt { font-size: 0.45em; color: #999; }
+.answer-btn-2.correct {
+background: #4CAF50; color: white;
+box-shadow: 0 5px 0 #388E3C, 0 5px 15px rgba(76,175,80,0.3);
+}
+.answer-btn-2.correct rt { color: rgba(255,255,255,0.75); }
+.answer-btn-2.wrong {
+background: #FF6B6B; color: white;
+box-shadow: 0 5px 0 #D32F2F, 0 5px 15px rgba(255,107,107,0.3);
+}
+.answer-btn-2.wrong rt { color: rgba(255,255,255,0.75); }
+.answer-btn-2.disabled { opacity: 0.6; }
+
+.choose-label {
+text-align: center; font-size: 18px; font-weight: 900; color: #E85D3A;
+margin-bottom: 12px; line-height: 1.6;
+}
+
+/* Feedback */
+.feedback-overlay {
+position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+display: -webkit-flex; display: flex;
+-webkit-align-items: center; align-items: center;
+-webkit-justify-content: center; justify-content: center;
+z-index: 100; pointer-events: none; opacity: 0;
+-webkit-transition: opacity 0.3s ease; transition: opacity 0.3s ease;
+}
+.feedback-overlay.show { opacity: 1; }
+.feedback-text { font-size: 80px; font-weight: 900; }
+
+/* Result */
+.result-screen {
+display: -webkit-flex; display: flex;
+-webkit-flex-direction: column; flex-direction: column;
+-webkit-align-items: center; align-items: center;
+-webkit-justify-content: center; justify-content: center;
+min-height: 70vh; text-align: center;
+}
+.result-emoji { font-size: 80px; margin-bottom: 12px; }
+.result-title { font-size: 30px; font-weight: 900; color: #2C1810; margin-bottom: 8px; }
+.result-score { font-size: 48px; font-weight: 900; color: #FFD700; margin-bottom: 4px; }
+.result-detail { font-size: 16px; color: #888; margin-bottom: 20px; line-height: 1.6; }
+.result-stars { font-size: 40px; margin-bottom: 20px; letter-spacing: 8px; }
+
+.retry-btn, .home-btn {
+border: none; border-radius: 16px; padding: 14px 36px;
+font-family: inherit; font-size: 17px; font-weight: 700;
+color: white; cursor: pointer; margin: 6px;
+box-shadow: 0 4px 0 rgba(0,0,0,0.2), 0 6px 12px rgba(0,0,0,0.15);
+line-height: 1.6;
+}
+.retry-btn rt, .home-btn rt { color: rgba(255,255,255,0.8); font-size: 0.5em; }
+.retry-btn { background: #E85D3A; }
+.home-btn { background: #0068B7; }
+
+.hidden { display: none !important; }
+
+@media (max-width: 400px) {
+.title-main { font-size: 28px; }
+.flow-station-name { font-size: 19px; }
+.flow-blank { font-size: 22px; padding: 6px 20px; }
+.answer-btn-2 { font-size: 19px; padding: 14px 8px; min-height: 70px; }
+.line-btn { min-width: 85px; }
+}
+</style>
+
+</head>
+<body>
+
+<div class="sky-gradient"></div>
+<div class="ground"></div>
+<div class="track"></div>
+<div class="feedback-overlay" id="feedbackOverlay"><div class="feedback-text" id="feedbackText"></div></div>
+
+<div class="app">
+  <!-- TITLE -->
+  <div id="titleScreen" class="title-screen">
+    <div class="title-train-emoji">🚃</div>
+    <div class="title-logo"><ruby>電車<rt>でんしゃ</rt></ruby> <ruby>大好<rt>だいす</rt></ruby>き!</div>
+    <div class="title-sub">〜 <ruby>関西版<rt>かんさいばん</rt></ruby> 〜</div>
+    <div class="title-main"><ruby>次<rt>つぎ</rt></ruby>の<ruby>駅<rt>えき</rt></ruby>は？</div>
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="modeQuiz" onclick="setMode('quiz')">🎯 <ruby>駅名<rt>えきめい</rt></ruby>クイズ</button>
+      <button class="mode-btn" id="modeMap" onclick="setMode('map')">📋 <ruby>路線図<rt>ろせんず</rt></ruby></button>
+    </div>
+    <div class="line-select" id="lineSelect"></div>
+  </div>
+
+  <!-- ROUTE MAP -->
+
+  <div id="routemapScreen" class="hidden">
+    <div class="routemap-header">
+      <button class="back-btn" onclick="showScreen('titleScreen')">🏠</button>
+      <span class="routemap-badge" id="routemapBadge"></span>
+      <span style="font-size:16px;">📋</span>
+    </div>
+    <div class="routemap-info" id="routemapInfo"></div>
+    <div class="route-list" id="routeList"></div>
+    <div style="text-align:center;">
+      <button class="home-btn" onclick="showScreen('titleScreen')"><ruby>他<rt>ほか</rt></ruby>の<ruby>路線<rt>ろせん</rt></ruby> 🏠</button>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+
+  <div id="quizScreen" class="hidden">
+    <div class="quiz-header">
+      <button class="back-btn" onclick="showScreen('titleScreen')">🏠</button>
+      <span class="line-badge" id="lineBadge"></span>
+      <span class="score-display" id="scoreDisplay">⭐ 0</span>
+    </div>
+    <div class="progress-label" id="progressLabel"></div>
+    <div class="flow-card" id="flowCard"></div>
+    <div class="choose-label">👆 どっちかな？</div>
+    <div class="answers-2" id="answers"></div>
+  </div>
+
+  <!-- RESULT -->
+
+  <div id="resultScreen" class="result-screen hidden">
+    <div class="result-emoji" id="resultEmoji">🎉</div>
+    <div class="result-title" id="resultTitle"></div>
+    <div class="result-score" id="resultScore"></div>
+    <div class="result-detail" id="resultDetail"></div>
+    <div class="result-stars" id="resultStars"></div>
+    <div>
+      <button class="retry-btn" id="retryBtn">もう<ruby>一回<rt>いっかい</rt></ruby> 🔄</button>
+      <button class="home-btn" id="homeBtn"><ruby>他<rt>ほか</rt></ruby>の<ruby>路線<rt>ろせん</rt></ruby> 🏠</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function R(k,f){ return '<ruby>'+k+'<rt>'+f+'</rt></ruby>'; }
+
+var LINES = [
+  {
+    id:'osaka_loop', isLoop:true,
+    nameHtml: R('大阪','おおさか')+R('環状線','かんじょうせん'),
+    companyHtml: 'JR'+R('西日本','にしにほん'),
+    color:'#E60012', icon:'🔴',
+    stations:[
+      ['大阪','おおさか'],['福島','ふくしま'],['野田','のだ'],['西九条','にしくじょう'],
+      ['弁天町','べんてんちょう'],['大正','たいしょう'],['芦原橋','あしはらばし'],['今宮','いまみや'],
+      ['新今宮','しんいまみや'],['天王寺','てんのうじ'],['寺田町','てらだちょう'],['桃谷','ももだに'],
+      ['鶴橋','つるはし'],['玉造','たまつくり'],['森ノ宮','もりのみや'],
+      ['大阪城公園','おおさかじょうこうえん'],['京橋','きょうばし'],['桜ノ宮','さくらのみや'],
+      ['天満','てんま'],['大阪','おおさか']
+    ]
+  },
+  {
+    id:'jr_kyoto',
+    nameHtml:'JR'+R('京都線','きょうとせん'),
+    companyHtml:'JR'+R('西日本','にしにほん'),
+    color:'#0068B7', icon:'🔵',
+    stations:[
+      ['京都','きょうと'],['西大路','にしおおじ'],['桂川','かつらがわ'],['向日町','むこうまち'],
+      ['長岡京','ながおかきょう'],['山崎','やまざき'],['島本','しまもと'],['高槻','たかつき'],
+      ['摂津富田','せっつとんだ'],['JR総持寺','じぇいあーるそうじじ'],['茨木','いばらき'],
+      ['千里丘','せんりおか'],['岸辺','きしべ'],['吹田','すいた'],
+      ['東淀川','ひがしよどがわ'],['新大阪','しんおおさか'],['大阪','おおさか']
+    ]
+  },
+  {
+    id:'jr_kobe',
+    nameHtml:'JR'+R('神戸線','こうべせん'),
+    companyHtml:'JR'+R('西日本','にしにほん'),
+    color:'#0068B7', icon:'💙',
+    stations:[
+      ['大阪','おおさか'],['塚本','つかもと'],['尼崎','あまがさき'],['立花','たちばな'],
+      ['甲子園口','こうしえんぐち'],['西宮','にしのみや'],['さくら夙川','さくらしゅくがわ'],
+      ['芦屋','あしや'],['甲南山手','こうなんやまて'],['摂津本山','せっつもとやま'],
+      ['住吉','すみよし'],['六甲道','ろっこうみち'],['摩耶','まや'],['灘','なだ'],
+      ['三ノ宮','さんのみや'],['元町','もとまち'],['神戸','こうべ']
+    ]
+  },
+  {
+    id:'midosuji',
+    nameHtml:R('御堂筋線','みどうすじせん'),
+    companyHtml:R('大阪','おおさか')+'メトロ',
+    color:'#E5171F', icon:'🔴',
+    stations:[
+      ['江坂','えさか'],['東三国','ひがしみくに'],['新大阪','しんおおさか'],
+      ['西中島南方','にしなかじまみなみがた'],['中津','なかつ'],['梅田','うめだ'],
+      ['淀屋橋','よどやばし'],['本町','ほんまち'],['心斎橋','しんさいばし'],['なんば','なんば'],
+      ['大国町','だいこくちょう'],['動物園前','どうぶつえんまえ'],['天王寺','てんのうじ'],
+      ['昭和町','しょうわちょう'],['西田辺','にしたなべ'],['長居','ながい'],['あびこ','あびこ'],
+      ['北花田','きたはなだ'],['新金岡','しんかなおか'],['なかもず','なかもず']
+    ]
+  },
+  {
+    id:'hankyu_kyoto',
+    nameHtml:R('阪急','はんきゅう')+R('京都線','きょうとせん'),
+    companyHtml:R('阪急','はんきゅう')+R('電鉄','でんてつ'),
+    color:'#814721', icon:'🚃',
+    stations:[
+      ['京都河原町','きょうとかわらまち'],['烏丸','からすま'],['大宮','おおみや'],['西院','さいいん'],
+      ['西京極','にしきょうごく'],['桂','かつら'],['洛西口','らくさいぐち'],
+      ['東向日','ひがしむこう'],['西向日','にしむこう'],['長岡天神','ながおかてんじん'],
+      ['西山天王山','にしやまてんのうざん'],['大山崎','おおやまざき'],['水無瀬','みなせ'],
+      ['上牧','かんまき'],['高槻市','たかつきし'],['富田','とんだ'],['総持寺','そうじじ'],
+      ['茨木市','いばらきし'],['南茨木','みなみいばらき'],['摂津市','せっつし'],
+      ['正雀','しょうじゃく'],['相川','あいかわ'],['上新庄','かみしんじょう'],['淡路','あわじ'],
+      ['崇禅寺','そうぜんじ'],['南方','みなみがた'],['十三','じゅうそう'],['大阪梅田','おおさかうめだ']
+    ]
+  },
+  {
+    id:'kintetsu_nara',
+    nameHtml:R('近鉄','きんてつ')+R('奈良線','ならせん'),
+    companyHtml:R('近鉄','きんてつ')+R('電鉄','でんてつ'),
+    color:'#CC4400', icon:'🦌',
+    stations:[
+      ['大阪難波','おおさかなんば'],['近鉄日本橋','きんてつにっぽんばし'],
+      ['大阪上本町','おおさかうえほんまち'],['鶴橋','つるはし'],['今里','いまざと'],
+      ['布施','ふせ'],['河内小阪','かわちこさか'],['東花園','ひがしはなぞの'],
+      ['河内永和','かわちえいわ'],['石切','いしきり'],
+      ['生駒','いこま'],['学園前','がくえんまえ'],['菖蒲池','あやめいけ'],
+      ['西ノ京','にしのきょう'],['新大宮','しんおおみや'],['近鉄奈良','きんてつなら']
+    ]
+  },
+  {
+    id:'hankyu_kobe',
+    nameHtml:R('阪急','はんきゅう')+R('神戸線','こうべせん'),
+    companyHtml:R('阪急','はんきゅう')+R('電鉄','でんてつ'),
+    color:'#1E50A2', icon:'🔵',
+    stations:[
+      ['大阪梅田','おおさかうめだ'],['中津','なかつ'],['十三','じゅうそう'],['神崎川','かんざきがわ'],
+      ['園田','そのだ'],['塚口','つかぐち'],['武庫之荘','むこのそう'],['西宮北口','にしのみやきたぐち'],
+      ['夙川','しゅくがわ'],['芦屋川','あしやがわ'],['岡本','おかもと'],['御影','みかげ'],
+      ['六甲','ろっこう'],['王子公園','おうじこうえん'],['春日野道','かすがのみち'],['神戸三宮','こうべさんのみや']
+    ]
+  },
+  {
+    id:'hanshin_honsen',
+    nameHtml:R('阪神','はんしん')+R('本線','ほんせん'),
+    companyHtml:R('阪神','はんしん')+R('電車','でんしゃ'),
+    color:'#F58220', icon:'🐯',
+    stations:[
+      ['大阪梅田','おおさかうめだ'],['福島','ふくしま'],['野田','のだ'],['淀川','よどがわ'],
+      ['姫島','ひめじま'],['千船','ちぶね'],['杭瀬','くいせ'],['大物','だいもつ'],
+      ['尼崎','あまがさき'],['出屋敷','でやしき'],['尼崎センタープール前','あまがさきせんたーぷーるまえ'],
+      ['武庫川','むこがわ'],['鳴尾・武庫川女子大前','なるお・むこがわじょしだいまえ'],
+      ['甲子園','こうしえん'],['久寿川','くすがわ'],['今津','いまづ'],
+      ['西宮','にしのみや'],['香櫨園','こうろえん'],['打出','うちで'],['芦屋','あしや'],
+      ['深江','ふかえ'],['青木','おうぎ'],['魚崎','うおざき'],['住吉','すみよし'],
+      ['御影','みかげ'],['石屋川','いしやがわ'],['新在家','しんざいけ'],['大石','おおいし'],
+      ['西灘','にしなだ'],['岩屋','いわや'],['春日野道','かすがのみち'],
+      ['神戸三宮','こうべさんのみや'],['元町','もとまち']
+    ]
+  },
+  {
+    id:'hankyu_takarazuka',
+    nameHtml:R('阪急','はんきゅう')+R('宝塚線','たからづかせん'),
+    companyHtml:R('阪急','はんきゅう')+R('電鉄','でんてつ'),
+    color:'#E85298', icon:'🎀',
+    stations:[
+      ['大阪梅田','おおさかうめだ'],['中津','なかつ'],['十三','じゅうそう'],['三国','みくに'],
+      ['庄内','しょうない'],['服部天神','はっとりてんじん'],['曽根','そね'],['岡町','おかまち'],
+      ['豊中','とよなか'],['蛍池','ほたるがいけ'],['石橋阪大前','いしばしはんだいまえ'],
+      ['池田','いけだ'],['川西能勢口','かわにしのせぐち'],['雲雀丘花屋敷','ひばりがおかはなやしき'],
+      ['山本','やまもと'],['中山観音','なかやまかんのん'],['売布神社','めふじんじゃ'],
+      ['清荒神','きよしこうじん'],['宝塚','たからづか']
+    ]
+  },
+  {
+    id:'nagahori',
+    nameHtml:R('長堀鶴見緑地線','ながほりつるみりょくちせん'),
+    companyHtml:R('大阪','おおさか')+'メトロ',
+    color:'#A9CC51', icon:'🌿',
+    stations:[
+      ['大正','たいしょう'],['ドーム前千代崎','どーむまえちよざき'],['西長堀','にしながほり'],
+      ['西大橋','にしおおはし'],['心斎橋','しんさいばし'],['長堀橋','ながほりばし'],
+      ['松屋町','まつやまち'],['谷町六丁目','たにまちろくちょうめ'],['玉造','たまつくり'],
+      ['森ノ宮','もりのみや'],['大阪ビジネスパーク','おおさかびじねすぱーく'],['京橋','きょうばし'],
+      ['蒲生四丁目','がもうよんちょうめ'],['今福鶴見','いまふくつるみ'],
+      ['横堤','よこづつみ'],['鶴見緑地','つるみりょくち'],['門真南','かどまみなみ']
+    ]
+  },
+  {
+    id:'jr_takarazuka',
+    nameHtml:'JR'+R('宝塚線','たからづかせん'),
+    companyHtml:'JR'+R('西日本','にしにほん'),
+    color:'#FCBA03', icon:'⭐',
+    stations:[
+      ['大阪','おおさか'],['塚本','つかもと'],['尼崎','あまがさき'],['塚口','つかぐち'],
+      ['猪名寺','いなでら'],['伊丹','いたみ'],['北伊丹','きたいたみ'],['川西池田','かわにしいけだ'],
+      ['中山寺','なかやまでら'],['宝塚','たからづか'],['生瀬','なまぜ'],['西宮名塩','にしのみやなじお'],
+      ['武田尾','たけだお'],['道場','どうじょう'],['三田','さんだ'],['新三田','しんさんだ'],
+      ['広野','ひろの'],['相野','あいの'],['藍本','あいもと'],['草野','くさの'],
+      ['古市','ふるいち'],['南矢代','みなみやしろ'],['篠山口','ささやまぐち']
+    ]
+  },
+  {
+    id:'jr_tozai',
+    nameHtml:'JR'+R('東西線','とうざいせん'),
+    companyHtml:'JR'+R('西日本','にしにほん'),
+    color:'#E9546B', icon:'🌸',
+    stations:[
+      ['京橋','きょうばし'],['大阪城北詰','おおさかじょうきたづめ'],['大阪天満宮','おおさかてんまんぐう'],
+      ['北新地','きたしんち'],['新福島','しんふくしま'],['海老江','えびえ'],
+      ['御幣島','みてじま'],['加島','かしま'],['尼崎','あまがさき']
+    ]
+  },
+  {
+    id:'jr_sanyo',
+    nameHtml:'JR'+R('山陽本線','さんようほんせん'),
+    companyHtml:'JR'+R('西日本','にしにほん'),
+    color:'#2B7A2F', icon:'🏯',
+    stations:[
+      ['神戸','こうべ'],['兵庫','ひょうご'],['新長田','しんながた'],['鷹取','たかとり'],
+      ['須磨海浜公園','すまかいひんこうえん'],['須磨','すま'],['塩屋','しおや'],['垂水','たるみ'],
+      ['舞子','まいこ'],['朝霧','あさぎり'],['明石','あかし'],['西明石','にしあかし'],
+      ['大久保','おおくぼ'],['魚住','うおずみ'],['土山','つちやま'],['東加古川','ひがしかこがわ'],
+      ['加古川','かこがわ'],['宝殿','ほうでん'],['曽根','そね'],['ひめじ別所','ひめじべっしょ'],
+      ['御着','ごちゃく'],['東姫路','ひがしひめじ'],['姫路','ひめじ']
+    ]
+  }
+];
+
+// State
+var currentMode = 'quiz';
+var currentLine = null;
+var questionIndex = 0;
+var score = 0;
+var totalQuestions = 0;
+var quizSegments = []; // array of {before:[], blankIdx:number, after:[], correct:station}
+var answerLocked = false;
+var QUIZ_LENGTH = 8;
+
+// Audio
+var audioCtx = null;
+function ensureAudio() {
+  if (!audioCtx) {
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+  }
+}
+function playSound(freqs, type, vol, dur) {
+  if (!audioCtx) return;
+  try {
+    for (var i = 0; i < freqs.length; i++) {
+      var o = audioCtx.createOscillator();
+      var g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      o.type = type || 'sine';
+      o.frequency.value = freqs[i][0];
+      g.gain.setValueAtTime(vol || 0.2, audioCtx.currentTime + (freqs[i][1] || 0));
+      g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + (freqs[i][1] || 0) + (dur || 0.3));
+      o.start(audioCtx.currentTime + (freqs[i][1] || 0));
+      o.stop(audioCtx.currentTime + (freqs[i][1] || 0) + (dur || 0.3));
+    }
+  } catch(e) {}
+}
+function playCorrectSound() { playSound([[523,0],[659,0.1],[784,0.2]], 'sine', 0.3, 0.3); }
+function playWrongSound() { playSound([[200,0],[150,0.15]], 'sawtooth', 0.15, 0.25); }
+function playResultSound() { playSound([[523,0],[659,0.15],[784,0.3],[1047,0.45]], 'sine', 0.2, 0.3); }
+
+// UI
+function showScreen(id) {
+  var screens = ['titleScreen','quizScreen','resultScreen','routemapScreen'];
+  for (var i = 0; i < screens.length; i++) {
+    var el = document.getElementById(screens[i]);
+    if (el) {
+      if (screens[i] === id) { el.className = el.className.replace(/ ?hidden/g, ''); }
+      else if (el.className.indexOf('hidden') === -1) { el.className += ' hidden'; }
+    }
+  }
+  window.scrollTo(0,0);
+}
+
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('modeQuiz').className = mode === 'quiz' ? 'mode-btn active' : 'mode-btn';
+  document.getElementById('modeMap').className = mode === 'map' ? 'mode-btn active' : 'mode-btn';
+  buildTitleScreen();
+}
+
+function buildTitleScreen() {
+  var c = document.getElementById('lineSelect');
+  c.innerHTML = '';
+  for (var i = 0; i < LINES.length; i++) {
+    (function(line) {
+      var btn = document.createElement('button');
+      btn.className = 'line-btn';
+      btn.style.background = line.color;
+      btn.innerHTML = '<span class="line-icon">' + line.icon + '</span>' +
+        '<span class="line-name">' + line.nameHtml + '</span>' +
+        '<span class="line-company">' + line.companyHtml + '</span>';
+      btn.onclick = function() {
+        if (currentMode === 'quiz') startQuiz(line); else showRouteMap(line);
+      };
+      c.appendChild(btn);
+    })(LINES[i]);
+  }
+}
+
+function stationRuby(st) {
+  return '<ruby>' + st[0] + '<rt>' + st[1] + '</rt></ruby>';
+}
+
+function getUnique(line) {
+  return line.isLoop ? line.stations.slice(0, -1) : line.stations;
+}
+
+// ===== ROUTE MAP =====
+function showRouteMap(line) {
+  currentLine = line;
+  var badge = document.getElementById('routemapBadge');
+  badge.innerHTML = line.nameHtml;
+  badge.style.background = line.color;
+
+  var isLoop = !!line.isLoop;
+  var ds = isLoop ? line.stations.slice(0,-1) : line.stations;
+  var count = ds.length;
+
+  var info = document.getElementById('routemapInfo');
+  if (isLoop) {
+    info.innerHTML = line.companyHtml + ' ／ ' + line.nameHtml + '<br>' +
+      '<span class="info-count">' + count + '</span> ' + R('駅','えき') + '　🔄 ' + R('環状','かんじょう');
+  } else {
+    info.innerHTML = line.companyHtml + ' ／ ' + line.nameHtml + '<br>' +
+      '<span class="info-count">' + count + '</span> ' + R('駅','えき') + '　' +
+      stationRuby(ds[0]) + ' ↔ ' + stationRuby(ds[count-1]);
+  }
+
+  var list = document.getElementById('routeList');
+  list.innerHTML = '';
+  for (var i = 0; i < count; i++) {
+    var isFirst = (i === 0), isLast = (i === count-1), isTerm = isFirst || isLast;
+    var row = document.createElement('div');
+    row.className = 'route-station';
+
+    var num = document.createElement('div');
+    num.className = 'station-number';
+    num.textContent = (i+1)+'';
+    row.appendChild(num);
+
+    var col = document.createElement('div');
+    col.className = 'route-line-col';
+    if (!isFirst) { var tc = document.createElement('div'); tc.className='route-connector'; tc.style.background=line.color; col.appendChild(tc); }
+    var dot = document.createElement('div');
+    dot.className = 'route-dot' + (isTerm ? ' terminal' : '');
+    dot.style.borderColor = line.color; dot.style.color = line.color;
+    if (isTerm) dot.style.background = line.color;
+    col.appendChild(dot);
+    if (!isLast) { var bc = document.createElement('div'); bc.className='route-connector'; bc.style.background=line.color; col.appendChild(bc); }
+    row.appendChild(col);
+
+    var nm = document.createElement('div');
+    nm.className = 'route-station-name' + (isTerm ? ' terminal-name' : '');
+    var h = stationRuby(ds[i]);
+    if (isLoop) {
+      if (isFirst) h += '<span class="terminal-tag" style="background:'+line.color+';">'+R('始発','しはつ')+'</span>';
+      if (isLast) h += '<span class="loop-tag">→ '+R('大阪','おおさか')+'へ</span>';
+    } else {
+      if (isFirst) h += '<span class="terminal-tag" style="background:'+line.color+';">'+R('始発','しはつ')+'</span>';
+      if (isLast) h += '<span class="terminal-tag" style="background:'+line.color+';">'+R('終着','しゅうちゃく')+'</span>';
+    }
+    nm.innerHTML = h;
+    row.appendChild(nm);
+    list.appendChild(row);
+  }
+  showScreen('routemapScreen');
+}
+
+// ===== QUIZ (Fill-in-the-blank) =====
+function startQuiz(line) {
+  ensureAudio();
+  currentLine = line;
+  score = 0;
+  questionIndex = 0;
+
+  var u = getUnique(line);
+  // Generate questions: pick random contiguous segments, blank one station in the middle
+  quizSegments = [];
+  var numQ = Math.min(QUIZ_LENGTH, u.length - 2); // need at least 3 stations for context
+
+  var usedBlanks = {};
+  var attempts = 0;
+  while (quizSegments.length < numQ && attempts < 200) {
+    attempts++;
+    // Window size: 3-5 stations shown
+    var winSize = Math.min(3 + Math.floor(Math.random() * 3), u.length); // 3,4,5
+    if (winSize < 3) winSize = 3;
+    var maxStart = u.length - winSize;
+    var start = Math.floor(Math.random() * (maxStart + 1));
+
+    // Pick blank position (not first or last in window)
+    var blankPos = 1 + Math.floor(Math.random() * (winSize - 2));
+    var blankAbsIdx = start + blankPos;
+
+    // Avoid duplicates
+    if (usedBlanks[blankAbsIdx]) continue;
+    usedBlanks[blankAbsIdx] = true;
+
+    var segment = u.slice(start, start + winSize);
+    quizSegments.push({
+      stations: segment,
+      blankPos: blankPos,
+      correct: segment[blankPos]
+    });
+  }
+
+  totalQuestions = quizSegments.length;
+  document.getElementById('lineBadge').innerHTML = line.nameHtml;
+  document.getElementById('lineBadge').style.background = line.color;
+  document.getElementById('scoreDisplay').textContent = '⭐ 0';
+
+  showScreen('quizScreen');
+  showQuestion();
+}
+
+function showQuestion() {
+  if (questionIndex >= totalQuestions) { showResult(); return; }
+  answerLocked = false;
+
+  document.getElementById('progressLabel').innerHTML =
+    (questionIndex+1) + ' / ' + totalQuestions + ' ' + R('問目','もんめ');
+
+  var seg = quizSegments[questionIndex];
+  var flowCard = document.getElementById('flowCard');
+  var html = '<div class="flow-title">' + R('駅','えき') + 'の' + R('順番','じゅんばん') + ' 🚃</div>';
+  html += '<div class="flow-stations">';
+
+  for (var i = 0; i < seg.stations.length; i++) {
+    if (i > 0) html += '<div class="flow-arrow">▼</div>';
+    if (i === seg.blankPos) {
+      html += '<div class="flow-item"><div class="flow-blank" id="blankSlot">❓</div></div>';
+    } else {
+      html += '<div class="flow-item"><div class="flow-station-name">' + stationRuby(seg.stations[i]) + '</div></div>';
+    }
+  }
+
+  html += '</div>';
+  flowCard.innerHTML = html;
+
+  // Generate 2 choices: correct + 1 wrong
+  var wrong = pickWrongStation(seg.correct);
+  var choices = [seg.correct, wrong];
+  // Shuffle
+  if (Math.random() > 0.5) { var t = choices[0]; choices[0] = choices[1]; choices[1] = t; }
+
+  var ad = document.getElementById('answers');
+  ad.innerHTML = '';
+  for (var j = 0; j < choices.length; j++) {
+    (function(ch) {
+      var btn = document.createElement('button');
+      btn.className = 'answer-btn-2';
+      btn.innerHTML = stationRuby(ch);
+      btn.setAttribute('data-key', ch[0]);
+      btn.onclick = function() { handleAnswer(btn, ch); };
+      ad.appendChild(btn);
+    })(choices[j]);
+  }
+}
+
+function pickWrongStation(correct) {
+  var all = getUnique(currentLine);
+  var attempts = 0;
+  while (attempts < 100) {
+    var r = all[Math.floor(Math.random() * all.length)];
+    if (r[0] !== correct[0]) return r;
+    attempts++;
+  }
+  return all[0]; // fallback
+}
+
+function handleAnswer(btn, chosen) {
+  if (answerLocked) return;
+  answerLocked = true;
+
+  var seg = quizSegments[questionIndex];
+  var correct = seg.correct;
+  var btns = document.querySelectorAll('.answer-btn-2');
+  var blank = document.getElementById('blankSlot');
+
+  if (chosen[0] === correct[0]) {
+    btn.className += ' correct';
+    score++;
+    document.getElementById('scoreDisplay').textContent = '⭐ ' + score;
+    playCorrectSound();
+    showFeedback('🎊');
+    // Fill in blank with correct answer
+    blank.className = 'flow-blank revealed-correct';
+    blank.innerHTML = stationRuby(correct);
+  } else {
+    btn.className += ' wrong';
+    playWrongSound();
+    showFeedback('😢');
+    // Show what they picked (wrong) then show correct
+    blank.className = 'flow-blank revealed-wrong';
+    blank.innerHTML = stationRuby(chosen);
+    // Show correct below
+    var correctShow = document.createElement('div');
+    correctShow.className = 'flow-correct-show';
+    correctShow.innerHTML = '→ ' + stationRuby(correct);
+    blank.parentNode.appendChild(correctShow);
+    // Also highlight correct button
+    for (var i = 0; i < btns.length; i++) {
+      if (btns[i].getAttribute('data-key') === correct[0]) {
+        btns[i].className += ' correct';
+      }
+    }
+  }
+
+  for (var k = 0; k < btns.length; k++) {
+    btns[k].className += ' disabled';
+  }
+
+  setTimeout(function() { questionIndex++; showQuestion(); }, 1800);
+}
+
+function showFeedback(emoji) {
+  var ov = document.getElementById('feedbackOverlay');
+  document.getElementById('feedbackText').textContent = emoji;
+  ov.className = 'feedback-overlay show';
+  setTimeout(function() { ov.className = 'feedback-overlay'; }, 1000);
+}
+
+function showResult() {
+  playResultSound();
+  showScreen('resultScreen');
+  var pct = totalQuestions > 0 ? score / totalQuestions : 0;
+  var emoji, title;
+  if (pct === 1) { emoji = '🏆'; title = 'パーフェクト！！'; }
+  else if (pct >= 0.8) { emoji = '🎉'; title = 'すごーい！'; }
+  else if (pct >= 0.5) { emoji = '😊'; title = 'がんばったね！'; }
+  else { emoji = '💪'; title = 'つぎはがんばろう！'; }
+  document.getElementById('resultEmoji').textContent = emoji;
+  document.getElementById('resultTitle').textContent = title;
+  document.getElementById('resultScore').textContent = score + ' / ' + totalQuestions;
+  document.getElementById('resultDetail').innerHTML = currentLine.nameHtml + ' クイズ';
+  var stars = pct === 1 ? 3 : pct >= 0.7 ? 2 : pct >= 0.4 ? 1 : 0;
+  var s = '';
+  for (var i = 0; i < 3; i++) s += (i < stars ? '⭐' : '☆');
+  document.getElementById('resultStars').textContent = s;
+}
+
+document.getElementById('retryBtn').onclick = function() { startQuiz(currentLine); };
+document.getElementById('homeBtn').onclick = function() { showScreen('titleScreen'); };
+
+buildTitleScreen();
+</script>
+
+</body>
+</html>
