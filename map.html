@@ -176,6 +176,10 @@ var STATIONS = {
   wakayama:{x:365,y:842,n:'和歌山',r:'わかやま',major:1},
   hineno:{x:488,y:732,n:'日根野',r:'ひねの'},
 
+  kusatsu:{x:728,y:130,n:'草津',r:'くさつ'},
+  kibukawa:{x:748,y:195,n:'貴生川',r:'きぶかわ'},
+  tsuge:{x:768,y:260,n:'柘植',r:'つげ'},
+
   oji:{x:648,y:532,n:'王寺',r:'おうじ'},
   kamo:{x:762,y:358,n:'加茂',r:'かも'},
 
@@ -242,6 +246,9 @@ var MAP_LINES = [
 
   {id:'jr_yamatoji',group:'jr',name:'大和路線',color:'#00A650',w:3,
    path:[{x:430,y:465},'shin_imamiya','tennoji',{x:510,y:540},'kyuhoji',{x:608,y:538},'oji',{x:715,y:515},'nara',{x:762,y:418},'kizu','kamo']},
+
+  {id:'jr_kusatsu',group:'jr',name:'草津線',color:'#6B8E23',w:2.5,
+   path:['kusatsu',{x:738,y:162},'kibukawa',{x:758,y:228},'tsuge']},
 
   {id:'jr_tozai',group:'jr',name:'JR東西線',color:'#E9546B',w:3,
    path:['kyobashi',{x:480,y:342},{x:440,y:345},{x:405,y:345},'amagasaki']},
