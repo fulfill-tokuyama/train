@@ -174,7 +174,11 @@ var STATIONS = {
   kishiwada:{x:415,y:658,n:'岸和田',r:'きしわだ'},
   izumisano:{x:398,y:732,n:'泉佐野',r:'いずみさの'},
   wakayama:{x:365,y:842,n:'和歌山',r:'わかやま',major:1},
-  hineno:{x:488,y:732,n:'日根野',r:'ひねの'}
+  hineno:{x:488,y:732,n:'日根野',r:'ひねの'},
+
+  shijo_omiya:{x:672,y:88,n:'四条大宮',r:'しじょうおおみや'},
+  katabiranotsuji:{x:622,y:100,n:'帷子ノ辻',r:'かたびらのつじ'},
+  kitano_hakubaicho:{x:648,y:55,n:'北野白梅町',r:'きたのはくばいちょう'}
 };
 
 var GROUPS = [
@@ -186,7 +190,8 @@ var GROUPS = [
   {id:'kintetsu',label:'近鉄',color:'#CC4400'},
   {id:'nankai',label:'南海電鉄',color:'#009B3E'},
   {id:'kyoto_sub',label:'京都地下鉄',color:'#3AAF37'},
-  {id:'kobe_sub',label:'神戸地下鉄',color:'#41A62D'}
+  {id:'kobe_sub',label:'神戸地下鉄',color:'#41A62D'},
+  {id:'keifuku',label:'京福電鉄',color:'#6B3FA0'}
 ];
 
 var MAP_LINES = [
@@ -264,7 +269,13 @@ var MAP_LINES = [
    path:['kokusaikaikan',{x:722,y:58},{x:710,y:78},'karasuma_oike',{x:682,y:108},'kyoto','takeda']},
 
   {id:'kobe_seishin',group:'kobe_sub',name:'西神・山手線',color:'#41A62D',w:3,
-   path:['shin_kobe','sannomiya',{x:175,y:365},'shin_nagata',{x:135,y:405},{x:110,y:420},'seishin_chuo']}
+   path:['shin_kobe','sannomiya',{x:175,y:365},'shin_nagata',{x:135,y:405},{x:110,y:420},'seishin_chuo']},
+
+  {id:'keifuku_arashiyama',group:'keifuku',name:'嵐山本線',color:'#6B3FA0',w:2.5,
+   path:['shijo_omiya',{x:648,y:92},'katabiranotsuji',{x:600,y:108},'arashiyama']},
+
+  {id:'keifuku_kitano',group:'keifuku',name:'北野線',color:'#9B59B6',w:2.5,
+   path:['katabiranotsuji',{x:635,y:78},'kitano_hakubaicho']}
 ];
 
 // ===== Render =====
@@ -324,7 +335,7 @@ function renderMap(){
     var fs=s.major?11:8.5;
     var fw=s.major?900:700;
     var dy=s.major?-10:-7;
-    if(sid==='shin_osaka'||sid==='esaka'||sid==='dainichi'||sid==='kokusaikaikan'||sid==='sasayamaguchi'||sid==='seishin_chuo'||sid==='arashiyama'||sid==='himeji')dy=-7;
+    if(sid==='shin_osaka'||sid==='esaka'||sid==='dainichi'||sid==='kokusaikaikan'||sid==='sasayamaguchi'||sid==='seishin_chuo'||sid==='arashiyama'||sid==='himeji'||sid==='kitano_hakubaicho')dy=-7;
     if(sid==='shin_kobe')dy=-6;
     if(sid==='kobe_sannomiya'){dy=-5;}
     if(sid==='nakamozu'||sid==='yao_minami'||sid==='suminoe_koen'||sid==='kyuhoji'||sid==='kadoma_minami'||sid==='wakayama'||sid==='hineno')dy=14;
