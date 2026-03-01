@@ -176,6 +176,12 @@ var STATIONS = {
   wakayama:{x:365,y:842,n:'和歌山',r:'わかやま',major:1},
   hineno:{x:488,y:732,n:'日根野',r:'ひねの'},
 
+  osaka_airport:{x:315,y:218,n:'大阪空港',r:'おおさかくうこう'},
+  senri_chuo:{x:390,y:208,n:'千里中央',r:'せんりちゅうおう'},
+  banpaku:{x:435,y:208,n:'万博記念公園',r:'ばんぱくきねんこうえん'},
+  kadomashi:{x:548,y:238,n:'門真市',r:'かどまし'},
+  saito_nishi:{x:458,y:188,n:'彩都西',r:'さいとにし'},
+
   katata:{x:735,y:68,n:'堅田',r:'かたた'},
   omi_imazu:{x:752,y:25,n:'近江今津',r:'おうみいまづ'},
   omi_shiotsu:{x:758,y:5,n:'近江塩津',r:'おうみしおつ'},
@@ -213,7 +219,8 @@ var GROUPS = [
   {id:'kyoto_sub',label:'京都地下鉄',color:'#3AAF37'},
   {id:'kobe_sub',label:'神戸地下鉄',color:'#41A62D'},
   {id:'keifuku',label:'京福電鉄',color:'#6B3FA0'},
-  {id:'shintetsu',label:'神戸電鉄',color:'#008080'}
+  {id:'shintetsu',label:'神戸電鉄',color:'#008080'},
+  {id:'osaka_mono',label:'大阪モノレール',color:'#00A0E9'}
 ];
 
 var MAP_LINES = [
@@ -308,6 +315,12 @@ var MAP_LINES = [
   {id:'jr_kishin',group:'jr',name:'姫新線',color:'#C71585',w:2.5,
    path:['himeji',{x:28,y:348},'hontatuno',{x:12,y:318},'sayo',{x:8,y:268},'tsuyama',{x:10,y:200},'niimi']},
 
+  {id:'mono_honsen',group:'osaka_mono',name:'大阪モノレール線',color:'#00A0E9',w:3,
+   path:['osaka_airport',{x:345,y:215},'senri_chuo','banpaku',{x:470,y:215},{x:500,y:222},'dainichi',{x:535,y:232},'kadomashi']},
+
+  {id:'mono_saito',group:'osaka_mono',name:'彩都線',color:'#E8740C',w:2.5,
+   path:['banpaku',{x:448,y:198},'saito_nishi']},
+
   {id:'shintetsu_arima',group:'shintetsu',name:'有馬線',color:'#008080',w:3,
    path:['minatogawa',{x:155,y:348},'suzurandai',{x:158,y:290},'tanigami',{x:195,y:252},'arima_guchi','arima_onsen']},
 
@@ -378,7 +391,7 @@ function renderMap(){
     var fs=s.major?11:8.5;
     var fw=s.major?900:700;
     var dy=s.major?-10:-7;
-    if(sid==='shin_osaka'||sid==='esaka'||sid==='dainichi'||sid==='kokusaikaikan'||sid==='sasayamaguchi'||sid==='seishin_chuo'||sid==='arashiyama'||sid==='himeji'||sid==='kitano_hakubaicho'||sid==='wadayama'||sid==='niimi')dy=-7;
+    if(sid==='shin_osaka'||sid==='esaka'||sid==='dainichi'||sid==='kokusaikaikan'||sid==='sasayamaguchi'||sid==='seishin_chuo'||sid==='arashiyama'||sid==='himeji'||sid==='kitano_hakubaicho'||sid==='wadayama'||sid==='niimi'||sid==='osaka_airport'||sid==='saito_nishi'||sid==='senri_chuo'||sid==='banpaku')dy=-7;
     if(sid==='shin_kobe')dy=-6;
     if(sid==='kobe_sannomiya'){dy=-5;}
     if(sid==='nakamozu'||sid==='yao_minami'||sid==='suminoe_koen'||sid==='kyuhoji'||sid==='kadoma_minami'||sid==='wakayama'||sid==='hineno'||sid==='woody_town'||sid==='omi_shiotsu')dy=14;
