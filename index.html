@@ -848,6 +848,19 @@ var LINES = [
     ]
   },
   {
+    id:'port_liner', group:'kobe_nt',
+    nameHtml:'ポートライナー',
+    companyHtml:R('神戸','こうべ')+R('新交通','しんこうつう'),
+    color:'#00B5E2', icon:'✈️',
+    stations:[
+      ['三宮','さんのみや'],['貿易センター','ぼうえきせんたー'],
+      ['ポートターミナル','ぽーとたーみなる'],['中公園','なかこうえん'],
+      ['みなとじま','みなとじま'],['市民広場','しみんひろば'],
+      ['医療センター','いりょうせんたー'],['計算科学センター','けいさんかがくせんたー'],
+      ['神戸空港','こうべくうこう']
+    ]
+  },
+  {
     id:'mono_honsen', group:'osaka_mono',
     nameHtml:R('大阪','おおさか')+'モノレール'+R('線','せん'),
     companyHtml:R('大阪','おおさか')+'モノレール',
@@ -989,7 +1002,8 @@ var GROUPS = [
   { id:'kobe_subway', label:'🌳 '+R('神戸','こうべ')+R('市営','しえい')+R('地下鉄','ちかてつ'), color:'#41A62D' },
   { id:'keifuku', label:'🟣 '+R('京福','けいふく')+R('電鉄','でんてつ'), color:'#6B3FA0' },
   { id:'shintetsu', label:'⛰️ '+R('神戸','こうべ')+R('電鉄','でんてつ'), color:'#008080' },
-  { id:'osaka_mono', label:'🚝 '+R('大阪','おおさか')+'モノレール', color:'#00A0E9' }
+  { id:'osaka_mono', label:'🚝 '+R('大阪','おおさか')+'モノレール', color:'#00A0E9' },
+  { id:'kobe_nt', label:'✈️ '+R('神戸','こうべ')+R('新交通','しんこうつう'), color:'#00B5E2' }
 ];
 
 function buildTitleScreen() {

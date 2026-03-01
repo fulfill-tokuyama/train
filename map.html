@@ -176,6 +176,9 @@ var STATIONS = {
   wakayama:{x:365,y:842,n:'和歌山',r:'わかやま',major:1},
   hineno:{x:488,y:732,n:'日根野',r:'ひねの'},
 
+  shimin_hiroba:{x:200,y:400,n:'市民広場',r:'しみんひろば'},
+  kobe_airport:{x:212,y:448,n:'神戸空港',r:'こうべくうこう'},
+
   kusatsu:{x:728,y:130,n:'草津',r:'くさつ'},
   kibukawa:{x:748,y:195,n:'貴生川',r:'きぶかわ'},
   tsuge:{x:768,y:260,n:'柘植',r:'つげ'},
@@ -227,7 +230,8 @@ var GROUPS = [
   {id:'kobe_sub',label:'神戸地下鉄',color:'#41A62D'},
   {id:'keifuku',label:'京福電鉄',color:'#6B3FA0'},
   {id:'shintetsu',label:'神戸電鉄',color:'#008080'},
-  {id:'osaka_mono',label:'大阪モノレール',color:'#00A0E9'}
+  {id:'osaka_mono',label:'大阪モノレール',color:'#00A0E9'},
+  {id:'kobe_nt',label:'神戸新交通',color:'#00B5E2'}
 ];
 
 var MAP_LINES = [
@@ -334,6 +338,9 @@ var MAP_LINES = [
   {id:'mono_saito',group:'osaka_mono',name:'彩都線',color:'#E8740C',w:2.5,
    path:['banpaku',{x:448,y:198},'saito_nishi']},
 
+  {id:'port_liner',group:'kobe_nt',name:'ポートライナー',color:'#00B5E2',w:2.5,
+   path:['sannomiya',{x:192,y:370},'shimin_hiroba',{x:206,y:425},'kobe_airport']},
+
   {id:'shintetsu_arima',group:'shintetsu',name:'有馬線',color:'#008080',w:3,
    path:['minatogawa',{x:155,y:348},'suzurandai',{x:158,y:290},'tanigami',{x:195,y:252},'arima_guchi','arima_onsen']},
 
@@ -407,7 +414,7 @@ function renderMap(){
     if(sid==='shin_osaka'||sid==='esaka'||sid==='dainichi'||sid==='kokusaikaikan'||sid==='sasayamaguchi'||sid==='seishin_chuo'||sid==='arashiyama'||sid==='himeji'||sid==='kitano_hakubaicho'||sid==='wadayama'||sid==='niimi'||sid==='osaka_airport'||sid==='saito_nishi'||sid==='senri_chuo'||sid==='banpaku')dy=-7;
     if(sid==='shin_kobe')dy=-6;
     if(sid==='kobe_sannomiya'){dy=-5;}
-    if(sid==='nakamozu'||sid==='yao_minami'||sid==='suminoe_koen'||sid==='kyuhoji'||sid==='kadoma_minami'||sid==='wakayama'||sid==='hineno'||sid==='woody_town'||sid==='omi_shiotsu')dy=14;
+    if(sid==='nakamozu'||sid==='yao_minami'||sid==='suminoe_koen'||sid==='kyuhoji'||sid==='kadoma_minami'||sid==='wakayama'||sid==='hineno'||sid==='woody_town'||sid==='omi_shiotsu'||sid==='kobe_airport')dy=14;
     if(sid==='ao')dy=-7;
     html+='<text class="'+cls+'" x="'+s.x+'" y="'+(s.y+dy)+'" text-anchor="middle" font-size="'+fs+'" font-weight="'+fw+'" fill="#2C1810">'+s.n+'</text>';
   }
