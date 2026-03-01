@@ -176,6 +176,10 @@ var STATIONS = {
   wakayama:{x:365,y:842,n:'和歌山',r:'わかやま',major:1},
   hineno:{x:488,y:732,n:'日根野',r:'ひねの'},
 
+  takada:{x:660,y:580,n:'高田',r:'たかだ'},
+  gojo:{x:618,y:660,n:'五条',r:'ごじょう'},
+  hashimoto_wr:{x:535,y:728,n:'橋本',r:'はしもと'},
+
   shimin_hiroba:{x:200,y:400,n:'市民広場',r:'しみんひろば'},
   kobe_airport:{x:212,y:448,n:'神戸空港',r:'こうべくうこう'},
 
@@ -250,6 +254,9 @@ var MAP_LINES = [
 
   {id:'jr_yamatoji',group:'jr',name:'大和路線',color:'#00A650',w:3,
    path:[{x:430,y:465},'shin_imamiya','tennoji',{x:510,y:540},'kyuhoji',{x:608,y:538},'oji',{x:715,y:515},'nara',{x:762,y:418},'kizu','kamo']},
+
+  {id:'jr_wakayama',group:'jr',name:'和歌山線',color:'#DA81B2',w:2.5,
+   path:['oji','takada',{x:640,y:625},'gojo',{x:578,y:698},'hashimoto_wr',{x:468,y:775},{x:410,y:815},'wakayama']},
 
   {id:'jr_kusatsu',group:'jr',name:'草津線',color:'#6B8E23',w:2.5,
    path:['kusatsu',{x:738,y:162},'kibukawa',{x:758,y:228},'tsuge']},
