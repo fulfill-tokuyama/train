@@ -176,6 +176,13 @@ var STATIONS = {
   wakayama:{x:365,y:842,n:'和歌山',r:'わかやま',major:1},
   hineno:{x:488,y:732,n:'日根野',r:'ひねの'},
 
+  teramae:{x:45,y:258,n:'寺前',r:'てらまえ'},
+  wadayama:{x:52,y:148,n:'和田山',r:'わだやま'},
+  hontatuno:{x:20,y:340,n:'本竜野',r:'ほんたつの'},
+  sayo:{x:8,y:298,n:'佐用',r:'さよ'},
+  tsuyama:{x:10,y:235,n:'津山',r:'つやま'},
+  niimi:{x:12,y:170,n:'新見',r:'にいみ'},
+
   minatogawa:{x:160,y:372,n:'湊川',r:'みなとがわ'},
   suzurandai:{x:148,y:318,n:'鈴蘭台',r:'すずらんだい'},
   tanigami:{x:172,y:265,n:'谷上',r:'たにがみ'},
@@ -288,6 +295,12 @@ var MAP_LINES = [
   {id:'keifuku_kitano',group:'keifuku',name:'北野線',color:'#9B59B6',w:2.5,
    path:['katabiranotsuji',{x:635,y:78},'kitano_hakubaicho']},
 
+  {id:'jr_bantan',group:'jr',name:'播但線',color:'#8B0000',w:2.5,
+   path:['himeji',{x:42,y:325},{x:44,y:290},'teramae',{x:48,y:218},{x:50,y:180},'wadayama']},
+
+  {id:'jr_kishin',group:'jr',name:'姫新線',color:'#C71585',w:2.5,
+   path:['himeji',{x:28,y:348},'hontatuno',{x:12,y:318},'sayo',{x:8,y:268},'tsuyama',{x:10,y:200},'niimi']},
+
   {id:'shintetsu_arima',group:'shintetsu',name:'有馬線',color:'#008080',w:3,
    path:['minatogawa',{x:155,y:348},'suzurandai',{x:158,y:290},'tanigami',{x:195,y:252},'arima_guchi','arima_onsen']},
 
@@ -358,7 +371,7 @@ function renderMap(){
     var fs=s.major?11:8.5;
     var fw=s.major?900:700;
     var dy=s.major?-10:-7;
-    if(sid==='shin_osaka'||sid==='esaka'||sid==='dainichi'||sid==='kokusaikaikan'||sid==='sasayamaguchi'||sid==='seishin_chuo'||sid==='arashiyama'||sid==='himeji'||sid==='kitano_hakubaicho')dy=-7;
+    if(sid==='shin_osaka'||sid==='esaka'||sid==='dainichi'||sid==='kokusaikaikan'||sid==='sasayamaguchi'||sid==='seishin_chuo'||sid==='arashiyama'||sid==='himeji'||sid==='kitano_hakubaicho'||sid==='wadayama'||sid==='niimi')dy=-7;
     if(sid==='shin_kobe')dy=-6;
     if(sid==='kobe_sannomiya'){dy=-5;}
     if(sid==='nakamozu'||sid==='yao_minami'||sid==='suminoe_koen'||sid==='kyuhoji'||sid==='kadoma_minami'||sid==='wakayama'||sid==='hineno'||sid==='woody_town')dy=14;
