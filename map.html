@@ -176,6 +176,16 @@ var STATIONS = {
   wakayama:{x:365,y:842,n:'和歌山',r:'わかやま',major:1},
   hineno:{x:488,y:732,n:'日根野',r:'ひねの'},
 
+  minatogawa:{x:160,y:372,n:'湊川',r:'みなとがわ'},
+  suzurandai:{x:148,y:318,n:'鈴蘭台',r:'すずらんだい'},
+  tanigami:{x:172,y:265,n:'谷上',r:'たにがみ'},
+  arima_guchi:{x:215,y:242,n:'有馬口',r:'ありまぐち'},
+  arima_onsen:{x:242,y:228,n:'有馬温泉',r:'ありまおんせん'},
+  sanda_shintetsu:{x:252,y:162,n:'三田',r:'さんだ'},
+  yokoyama:{x:248,y:178,n:'横山',r:'よこやま'},
+  woody_town:{x:280,y:168,n:'ウッディタウン中央',r:'うっでぃたうんちゅうおう'},
+  ao:{x:68,y:312,n:'粟生',r:'あお'},
+
   shijo_omiya:{x:672,y:88,n:'四条大宮',r:'しじょうおおみや'},
   katabiranotsuji:{x:622,y:100,n:'帷子ノ辻',r:'かたびらのつじ'},
   kitano_hakubaicho:{x:648,y:55,n:'北野白梅町',r:'きたのはくばいちょう'}
@@ -191,7 +201,8 @@ var GROUPS = [
   {id:'nankai',label:'南海電鉄',color:'#009B3E'},
   {id:'kyoto_sub',label:'京都地下鉄',color:'#3AAF37'},
   {id:'kobe_sub',label:'神戸地下鉄',color:'#41A62D'},
-  {id:'keifuku',label:'京福電鉄',color:'#6B3FA0'}
+  {id:'keifuku',label:'京福電鉄',color:'#6B3FA0'},
+  {id:'shintetsu',label:'神戸電鉄',color:'#008080'}
 ];
 
 var MAP_LINES = [
@@ -275,7 +286,19 @@ var MAP_LINES = [
    path:['shijo_omiya',{x:648,y:92},'katabiranotsuji',{x:600,y:108},'arashiyama']},
 
   {id:'keifuku_kitano',group:'keifuku',name:'北野線',color:'#9B59B6',w:2.5,
-   path:['katabiranotsuji',{x:635,y:78},'kitano_hakubaicho']}
+   path:['katabiranotsuji',{x:635,y:78},'kitano_hakubaicho']},
+
+  {id:'shintetsu_arima',group:'shintetsu',name:'有馬線',color:'#008080',w:3,
+   path:['minatogawa',{x:155,y:348},'suzurandai',{x:158,y:290},'tanigami',{x:195,y:252},'arima_guchi','arima_onsen']},
+
+  {id:'shintetsu_sanda',group:'shintetsu',name:'三田線',color:'#2E8B57',w:2.5,
+   path:['arima_guchi',{x:230,y:228},{x:242,y:208},'yokoyama',{x:250,y:170},'sanda_shintetsu']},
+
+  {id:'shintetsu_ao',group:'shintetsu',name:'粟生線',color:'#5F9EA0',w:2.5,
+   path:['suzurandai',{x:128,y:318},{x:100,y:315},'ao']},
+
+  {id:'shintetsu_koen',group:'shintetsu',name:'公園都市線',color:'#20B2AA',w:2.5,
+   path:['yokoyama','woody_town']}
 ];
 
 // ===== Render =====
@@ -338,7 +361,8 @@ function renderMap(){
     if(sid==='shin_osaka'||sid==='esaka'||sid==='dainichi'||sid==='kokusaikaikan'||sid==='sasayamaguchi'||sid==='seishin_chuo'||sid==='arashiyama'||sid==='himeji'||sid==='kitano_hakubaicho')dy=-7;
     if(sid==='shin_kobe')dy=-6;
     if(sid==='kobe_sannomiya'){dy=-5;}
-    if(sid==='nakamozu'||sid==='yao_minami'||sid==='suminoe_koen'||sid==='kyuhoji'||sid==='kadoma_minami'||sid==='wakayama'||sid==='hineno')dy=14;
+    if(sid==='nakamozu'||sid==='yao_minami'||sid==='suminoe_koen'||sid==='kyuhoji'||sid==='kadoma_minami'||sid==='wakayama'||sid==='hineno'||sid==='woody_town')dy=14;
+    if(sid==='ao')dy=-7;
     html+='<text class="'+cls+'" x="'+s.x+'" y="'+(s.y+dy)+'" text-anchor="middle" font-size="'+fs+'" font-weight="'+fw+'" fill="#2C1810">'+s.n+'</text>';
   }
 
