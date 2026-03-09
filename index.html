@@ -1979,6 +1979,19 @@ function searchStationsTop(query){
   return results.slice(0,30);
 }
 
+function findLinesForStation(stationName){
+  var found=[];
+  for(var i=0;i<LINES.length;i++){
+    for(var j=0;j<LINES[i].stations.length;j++){
+      if(LINES[i].stations[j][0]===stationName){
+        found.push(LINES[i]);
+        break;
+      }
+    }
+  }
+  return found;
+}
+
 function renderSearchResults(results){
   var box=document.getElementById('stationSearchResults');
   if(results.length===0){
@@ -2000,14 +2013,38 @@ function renderSearchResults(results){
   for(var j=0;j<items.length;j++){
     items[j].addEventListener('click',function(){
       var name=this.getAttribute('data-name');
-      closeStationSearch();
-      goToStationOnMap(name);
+      var lines=findLinesForStation(name);
+      if(lines.length===1){
+        closeStationSearch();
+        showRouteMap(lines[0]);
+      } else {
+        showLineChoices(name,lines);
+      }
     });
   }
 }
 
-function goToStationOnMap(stationName){
-  window.location.href='map.html?search='+encodeURIComponent(stationName);
+function showLineChoices(stationName,lines){
+  var box=document.getElementById('stationSearchResults');
+  var html='<div style="padding:8px 0;font-size:13px;font-weight:900;color:#2C1810;text-align:center;">「'+stationName+'」の<ruby>路線<rt>ろせん</rt></ruby>をえらんでね</div>';
+  for(var i=0;i<lines.length;i++){
+    var ln=lines[i];
+    var lineName=ln.nameHtml.replace(/<ruby>|<\/ruby>|<rt>.*?<\/rt>/g,'');
+    html+='<div class="search-modal-item" data-line-idx="'+i+'">';
+    html+='<span class="sm-dot" style="background:'+ln.color+';"></span>';
+    html+='<span>'+lineName+'</span>';
+    html+='</div>';
+  }
+  box.innerHTML=html;
+  var items=box.querySelectorAll('.search-modal-item');
+  for(var j=0;j<items.length;j++){
+    (function(idx){
+      items[idx].addEventListener('click',function(){
+        closeStationSearch();
+        showRouteMap(lines[idx]);
+      });
+    })(j);
+  }
 }
 
 function openStationSearch(){
