@@ -1031,6 +1031,21 @@ buildLegend();
 fitMap();
 window.addEventListener('resize',fitMap);
 
+// Auto-search from URL param
+(function(){
+  var params=new URLSearchParams(window.location.search);
+  var q=params.get('search');
+  if(q){
+    // Find station by name
+    for(var sid in STATIONS){
+      if(STATIONS[sid].n===q){
+        focusStation(sid);
+        break;
+      }
+    }
+  }
+})();
+
 setTimeout(function(){
   var h=document.getElementById('hint');
   h.style.opacity='0';

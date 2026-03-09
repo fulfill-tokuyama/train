@@ -102,6 +102,58 @@ line-height: 1.6;
 .line-btn .line-company { display: none; }
 .line-btn rt { font-size: 0.5em; color: rgba(255,255,255,0.85); }
 
+/* ===== Station Search ===== */
+.search-btn-top{
+  display:inline-block;background:#3A7BE8;color:white;text-decoration:none;
+  padding:12px 24px;border-radius:14px;font-size:16px;font-weight:900;
+  box-shadow:0 4px 0 rgba(0,0,0,0.2),0 6px 12px rgba(0,0,0,0.15);
+  line-height:1.6;border:none;cursor:pointer;font-family:inherit;
+  vertical-align:top;
+}
+.search-overlay{
+  display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:1000;
+  background:rgba(0,0,0,0.4);
+  -webkit-justify-content:center;justify-content:center;
+  -webkit-align-items:flex-start;align-items:flex-start;
+  padding-top:15vh;
+}
+.search-overlay.show{
+  display:-webkit-flex;display:flex;
+}
+.search-modal{
+  background:white;border-radius:20px;width:90%;max-width:400px;
+  padding:20px;box-shadow:0 8px 30px rgba(0,0,0,0.25);
+}
+.search-modal h2{font-size:16px;font-weight:900;color:#2C1810;margin-bottom:12px;text-align:center;}
+.search-modal-input{
+  width:100%;padding:12px 16px;border:2px solid #ddd;border-radius:14px;
+  font-size:16px;outline:none;font-family:inherit;
+}
+.search-modal-input:focus{border-color:#3A7BE8;}
+.search-modal-results{
+  max-height:45vh;overflow-y:auto;margin-top:10px;
+}
+.search-modal-results:empty{margin-top:0;}
+.search-modal-item{
+  display:-webkit-flex;display:flex;
+  -webkit-align-items:center;align-items:center;
+  gap:10px;padding:10px 8px;border-radius:10px;cursor:pointer;
+  font-size:14px;font-weight:700;color:#2C1810;
+}
+.search-modal-item:hover,.search-modal-item:active{background:#EEF2FF;}
+.search-modal-item .sm-line{
+  font-size:10px;color:#888;font-weight:500;white-space:nowrap;
+}
+.search-modal-item .sm-reading{font-size:12px;color:#888;font-weight:500;margin-left:auto;}
+.search-modal-item .sm-dot{
+  width:10px;height:10px;border-radius:50%;flex-shrink:0;-webkit-flex-shrink:0;
+}
+.search-modal-close{
+  display:block;margin:12px auto 0;background:#eee;border:none;border-radius:10px;
+  padding:8px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;color:#666;
+}
+.search-modal-noresult{font-size:13px;color:#999;padding:10px 8px;text-align:center;}
+
 /* ===== Route Map ===== */
 .routemap-header {
 display: -webkit-flex; display: flex;
@@ -327,8 +379,18 @@ line-height: 1.6;
     <div class="title-logo"><ruby>電車<rt>でんしゃ</rt></ruby> <ruby>大好<rt>だいす</rt></ruby>き!</div>
     <div class="title-sub">〜 <ruby>関西版<rt>かんさいばん</rt></ruby> 〜</div>
     <div class="title-main"><ruby>次<rt>つぎ</rt></ruby>の<ruby>駅<rt>えき</rt></ruby>は？</div>
-    <div style="margin-bottom:12px;">
+    <div style="margin-bottom:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
       <a href="map.html" style="display:inline-block;background:#0068B7;color:white;text-decoration:none;padding:12px 24px;border-radius:14px;font-size:16px;font-weight:900;box-shadow:0 4px 0 rgba(0,0,0,0.2),0 6px 12px rgba(0,0,0,0.15);line-height:1.6;">🗺️ <ruby>路線<rt>ろせん</rt></ruby>マップ</a>
+      <button class="search-btn-top" onclick="openStationSearch()">🔍 <ruby>駅<rt>えき</rt></ruby>けんさく</button>
+    </div>
+
+    <div class="search-overlay" id="searchOverlay" onclick="closeSearchOverlay(event)">
+      <div class="search-modal">
+        <h2>🔍 <ruby>駅名<rt>えきめい</rt></ruby>けんさく</h2>
+        <input class="search-modal-input" id="stationSearchInput" type="text" placeholder="えきめいを いれてね..." autocomplete="off">
+        <div class="search-modal-results" id="stationSearchResults"></div>
+        <button class="search-modal-close" onclick="closeStationSearch()">とじる</button>
+      </div>
     </div>
     <div class="mode-toggle">
       <button class="mode-btn active" id="modeQuiz" onclick="setMode('quiz')">🎯 <ruby>駅名<rt>えきめい</rt></ruby>クイズ</button>
@@ -1870,6 +1932,113 @@ document.getElementById('retryBtn').onclick = function() { startQuiz(currentLine
 document.getElementById('homeBtn').onclick = function() { showScreen('titleScreen'); };
 
 buildTitleScreen();
+
+// ===== Station Search =====
+function toHiragana(str){
+  return str.replace(/[\u30A1-\u30F6]/g,function(c){
+    return String.fromCharCode(c.charCodeAt(0)-0x60);
+  });
+}
+
+function getAllStations(){
+  var map={};
+  for(var i=0;i<LINES.length;i++){
+    var ln=LINES[i];
+    for(var j=0;j<ln.stations.length;j++){
+      var name=ln.stations[j][0];
+      var reading=ln.stations[j][1];
+      if(!map[name]){
+        map[name]={name:name,reading:reading,lines:[],colors:[]};
+      }
+      var lineName=ln.nameHtml.replace(/<ruby>|<\/ruby>|<rt>.*?<\/rt>/g,'');
+      if(map[name].lines.indexOf(lineName)<0){
+        map[name].lines.push(lineName);
+        map[name].colors.push(ln.color);
+      }
+    }
+  }
+  var arr=[];
+  for(var k in map) arr.push(map[k]);
+  return arr;
+}
+
+var allStations=getAllStations();
+
+function searchStationsTop(query){
+  if(!query) return [];
+  var q=toHiragana(query.toLowerCase());
+  var results=[];
+  for(var i=0;i<allStations.length;i++){
+    var s=allStations[i];
+    var nameMatch=s.name.indexOf(query)>=0;
+    var readingMatch=s.reading&&toHiragana(s.reading).indexOf(q)>=0;
+    if(nameMatch||readingMatch){
+      results.push(s);
+    }
+  }
+  return results.slice(0,30);
+}
+
+function renderSearchResults(results){
+  var box=document.getElementById('stationSearchResults');
+  if(results.length===0){
+    box.innerHTML='<div class="search-modal-noresult">みつかりません</div>';
+    return;
+  }
+  var html='';
+  for(var i=0;i<results.length;i++){
+    var s=results[i];
+    html+='<div class="search-modal-item" data-name="'+s.name+'">';
+    html+='<span class="sm-dot" style="background:'+s.colors[0]+';"></span>';
+    html+='<span>'+s.name+'</span>';
+    html+='<span class="sm-line">'+s.lines.join(', ')+'</span>';
+    html+='<span class="sm-reading">'+s.reading+'</span>';
+    html+='</div>';
+  }
+  box.innerHTML=html;
+  var items=box.querySelectorAll('.search-modal-item');
+  for(var j=0;j<items.length;j++){
+    items[j].addEventListener('click',function(){
+      var name=this.getAttribute('data-name');
+      closeStationSearch();
+      goToStationOnMap(name);
+    });
+  }
+}
+
+function goToStationOnMap(stationName){
+  window.location.href='map.html?search='+encodeURIComponent(stationName);
+}
+
+function openStationSearch(){
+  document.getElementById('searchOverlay').className='search-overlay show';
+  var inp=document.getElementById('stationSearchInput');
+  inp.value='';
+  document.getElementById('stationSearchResults').innerHTML='';
+  setTimeout(function(){inp.focus();},100);
+}
+
+function closeStationSearch(){
+  document.getElementById('searchOverlay').className='search-overlay';
+}
+
+function closeSearchOverlay(e){
+  if(e.target===document.getElementById('searchOverlay')) closeStationSearch();
+}
+
+var isComposingTop=false;
+var searchInpTop=document.getElementById('stationSearchInput');
+
+function doSearchTop(){
+  var q=searchInpTop.value.trim();
+  var box=document.getElementById('stationSearchResults');
+  if(!q){box.innerHTML='';return;}
+  renderSearchResults(searchStationsTop(q));
+}
+
+searchInpTop.addEventListener('compositionstart',function(){isComposingTop=true;});
+searchInpTop.addEventListener('compositionend',function(){isComposingTop=false;doSearchTop();});
+searchInpTop.addEventListener('input',function(){if(!isComposingTop)doSearchTop();});
 </script>
 
 </body>
