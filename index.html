@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<title>つぎのえきは？かんさい でんしゃクイズ</title>
+<title>つぎのえきは？でんしゃクイズ</title>
 <style>
   * { margin: 0; padding: 0; -webkit-box-sizing: border-box; box-sizing: border-box; }
   html, body { width: 100%; min-height: 100%; }
@@ -49,6 +49,19 @@ min-height: 80vh; text-align: center;
 .title-sub { font-size: 16px; font-weight: 700; margin-bottom: 4px; color: #E85D3A; }
 .title-main { font-size: 36px; font-weight: 900; margin-bottom: 16px; letter-spacing: 2px; line-height: 1.5; color: #E85D3A; }
 .title-train-emoji { font-size: 60px; margin-bottom: 12px; }
+
+.region-toggle {
+display: -webkit-flex; display: flex;
+margin-bottom: 12px; border-radius: 14px; overflow: hidden;
+box-shadow: 0 2px 8px rgba(0,0,0,0.1); width: 100%;
+}
+.region-btn {
+-webkit-flex: 1; flex: 1; border: none; padding: 12px 8px;
+font-family: inherit; font-size: 15px; font-weight: 900;
+cursor: pointer; background: white; color: #999; line-height: 1.6;
+}
+.region-btn.active { background: #0068B7; color: white; }
+.region-btn.active rt { color: rgba(255,255,255,0.8); }
 
 .mode-toggle {
 display: -webkit-flex; display: flex;
@@ -379,11 +392,15 @@ line-height: 1.6;
   <div id="titleScreen" class="title-screen">
     <div class="title-train-emoji">🚃</div>
     <div class="title-logo"><ruby>電車<rt>でんしゃ</rt></ruby> <ruby>大好<rt>だいす</rt></ruby>き!</div>
-    <div class="title-sub">〜 <ruby>関西版<rt>かんさいばん</rt></ruby> 〜</div>
+    <div class="title-sub" id="titleSub">〜 <ruby>関西版<rt>かんさいばん</rt></ruby> 〜</div>
     <div class="title-main"><ruby>次<rt>つぎ</rt></ruby>の<ruby>駅<rt>えき</rt></ruby>は？</div>
-    <div style="margin-bottom:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-      <a href="map.html" style="display:inline-block;background:#0068B7;color:white;text-decoration:none;padding:12px 24px;border-radius:14px;font-size:16px;font-weight:900;box-shadow:0 4px 0 rgba(0,0,0,0.2),0 6px 12px rgba(0,0,0,0.15);line-height:1.6;">🗺️ <ruby>路線<rt>ろせん</rt></ruby>マップ</a>
+    <div style="margin-bottom:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;" id="titleButtons">
+      <a href="map.html" id="mapLink" style="display:inline-block;background:#0068B7;color:white;text-decoration:none;padding:12px 24px;border-radius:14px;font-size:16px;font-weight:900;box-shadow:0 4px 0 rgba(0,0,0,0.2),0 6px 12px rgba(0,0,0,0.15);line-height:1.6;">🗺️ <ruby>路線<rt>ろせん</rt></ruby>マップ</a>
       <button class="search-btn-top" onclick="openStationSearch()">🔍 <ruby>駅<rt>えき</rt></ruby>けんさく</button>
+    </div>
+    <div class="region-toggle">
+      <button class="region-btn active" id="regionKansai" onclick="setRegion('kansai')">📍 <ruby>関西<rt>かんさい</rt></ruby></button>
+      <button class="region-btn" id="regionKanto" onclick="setRegion('kanto')">📍 <ruby>関東<rt>かんとう</rt></ruby></button>
     </div>
 
     <div class="search-overlay" id="searchOverlay" onclick="closeSearchOverlay(event)">
@@ -565,6 +582,50 @@ var LINES = [
       ['福島','ふくしま'],['米沢','よねざわ'],['高畠','たかはた'],['赤湯','あかゆ'],
       ['かみのやま温泉','かみのやまおんせん'],['山形','やまがた'],['天童','てんどう'],
       ['新庄','しんじょう']
+    ]
+  },
+  {
+    id:'yamanote', isLoop:true, group:'jr_east',
+    nameHtml:R('山手線','やまのてせん'),
+    companyHtml:'JR'+R('東日本','ひがしにほん'),
+    color:'#00A650', icon:'🟢',
+    stations:[
+      ['品川','しながわ'],['大崎','おおさき'],['五反田','ごたんだ'],['目黒','めぐろ'],
+      ['恵比寿','えびす'],['渋谷','しぶや'],['原宿','はらじゅく'],['代々木','よよぎ'],
+      ['新宿','しんじゅく'],['新大久保','しんおおくぼ'],['高田馬場','たかだのばば'],['目白','めじろ'],
+      ['池袋','いけぶくろ'],['大塚','おおつか'],['巣鴨','すがも'],['駒込','こまごめ'],
+      ['田端','たばた'],['西日暮里','にしにっぽり'],['日暮里','にっぽり'],['鶯谷','うぐいすだに'],
+      ['上野','うえの'],['御徒町','おかちまち'],['秋葉原','あきはばら'],['神田','かんだ'],
+      ['東京','とうきょう'],['有楽町','ゆうらくちょう'],['新橋','しんばし'],['浜松町','はままつちょう'],
+      ['田町','たまち'],['高輪ゲートウェイ','たかなわげーとうぇい'],['品川','しながわ']
+    ]
+  },
+  {
+    id:'jr_chuo_rapid', group:'jr_east',
+    nameHtml:R('中央線','ちゅうおうせん')+R('快速','かいそく'),
+    companyHtml:'JR'+R('東日本','ひがしにほん'),
+    color:'#F68B1F', icon:'🟠',
+    stations:[
+      ['東京','とうきょう'],['神田','かんだ'],['御茶ノ水','おちゃのみず'],['四ツ谷','よつや'],
+      ['新宿','しんじゅく'],['中野','なかの'],['高円寺','こうえんじ'],['阿佐ヶ谷','あさがや'],
+      ['荻窪','おぎくぼ'],['西荻窪','にしおぎくぼ'],['吉祥寺','きちじょうじ'],['三鷹','みたか'],
+      ['武蔵境','むさしさかい'],['東小金井','ひがしこがねい'],['武蔵小金井','むさしこがねい'],
+      ['国分寺','こくぶんじ'],['西国分寺','にしこくぶんじ'],['国立','くにたち'],
+      ['立川','たちかわ'],['日野','ひの'],['豊田','とよた'],['八王子','はちおうじ'],
+      ['西八王子','にしはちおうじ'],['高尾','たかお']
+    ]
+  },
+  {
+    id:'metro_ginza', group:'tokyo_metro',
+    nameHtml:R('銀座線','ぎんざせん'),
+    companyHtml:R('東京','とうきょう')+'メトロ',
+    color:'#F68B1F', icon:'🟠',
+    stations:[
+      ['渋谷','しぶや'],['表参道','おもてさんどう'],['外苑前','がいえんまえ'],['青山一丁目','あおやまいっちょうめ'],
+      ['赤坂見附','あかさかみつけ'],['溜池山王','ためいけさんのう'],['虎ノ門','とらのもん'],
+      ['新橋','しんばし'],['銀座','ぎんざ'],['京橋','きょうばし'],['日本橋','にほんばし'],
+      ['三越前','みつこしまえ'],['神田','かんだ'],['末広町','すえひろちょう'],['上野広小路','うえのひろこうじ'],
+      ['上野','うえの'],['稲荷町','いなりちょう'],['田原町','たわらまち'],['浅草','あさくさ']
     ]
   },
   {
@@ -1667,6 +1728,7 @@ var LINES = [
 ];
 
 // State
+var currentRegion = 'kansai';
 var currentMode = 'quiz';
 var currentLine = null;
 var questionIndex = 0;
@@ -1716,6 +1778,16 @@ function showScreen(id) {
   window.scrollTo(0,0);
 }
 
+function setRegion(region) {
+  currentRegion = region;
+  document.getElementById('regionKansai').className = region === 'kansai' ? 'region-btn active' : 'region-btn';
+  document.getElementById('regionKanto').className = region === 'kanto' ? 'region-btn active' : 'region-btn';
+  document.getElementById('titleSub').innerHTML = region === 'kansai' ? '〜 '+R('関西版','かんさいばん')+' 〜' : '〜 '+R('関東版','かんとうばん')+' 〜';
+  var mapLink = document.getElementById('mapLink');
+  if (mapLink) mapLink.style.display = region === 'kansai' ? 'inline-block' : 'none';
+  buildTitleScreen();
+}
+
 function setMode(mode) {
   currentMode = mode;
   document.getElementById('modeQuiz').className = mode === 'quiz' ? 'mode-btn active' : 'mode-btn';
@@ -1724,32 +1796,34 @@ function setMode(mode) {
 }
 
 var GROUPS = [
-  { id:'shinkansen', label:'🚅 '+R('新幹線','しんかんせん'), color:'#E60012' },
-  { id:'jr', label:'🚄 JR'+R('西日本','にしにほん'), color:'#0068B7' },
-  { id:'hankyu', label:'🚃 '+R('阪急','はんきゅう')+R('電鉄','でんてつ'), color:'#814721' },
-  { id:'hanshin', label:'🐯 '+R('阪神','はんしん')+R('電車','でんしゃ'), color:'#F58220' },
-  { id:'metro', label:'🚇 '+R('大阪','おおさか')+'メトロ', color:'#E5171F' },
-  { id:'keihan', label:'🟢 '+R('京阪','けいはん')+R('電車','でんしゃ'), color:'#2B4B36' },
-  { id:'kintetsu', label:'🦌 '+R('近鉄','きんてつ')+R('電鉄','でんてつ'), color:'#CC4400' },
-  { id:'nankai', label:'🟩 '+R('南海','なんかい')+R('電鉄','でんてつ'), color:'#009B3E' },
-  { id:'kyoto_subway', label:'🍃 '+R('京都','きょうと')+R('市営','しえい')+R('地下鉄','ちかてつ'), color:'#3AAF37' },
-  { id:'kobe_subway', label:'🌳 '+R('神戸','こうべ')+R('市営','しえい')+R('地下鉄','ちかてつ'), color:'#41A62D' },
-  { id:'keifuku', label:'🟣 '+R('京福','けいふく')+R('電鉄','でんてつ'), color:'#6B3FA0' },
-  { id:'shintetsu', label:'⛰️ '+R('神戸','こうべ')+R('電鉄','でんてつ'), color:'#008080' },
-  { id:'osaka_mono', label:'🚝 '+R('大阪','おおさか')+'モノレール', color:'#00A0E9' },
-  { id:'kobe_nt', label:'✈️ '+R('神戸','こうべ')+R('新交通','しんこうつう'), color:'#00B5E2' },
-  { id:'sanyo', label:'🔴 '+R('山陽','さんよう')+R('電鉄','でんてつ'), color:'#E60012' },
-  { id:'eizan', label:'🌿 '+R('叡山','えいざん')+R('電鉄','でんてつ'), color:'#3A913F' },
-  { id:'nose', label:'🏔️ '+R('能勢','のせ')+R('電鉄','でんてつ'), color:'#F58220' },
-  { id:'kitakyu', label:'🚇 '+R('北大阪急行','きたおおさかきゅうこう'), color:'#8D0528' },
-  { id:'hankai', label:'🚊 '+R('阪堺','はんかい')+R('電気軌道','でんききどう'), color:'#F7931E' },
-  { id:'mizuma', label:'🚃 '+R('水間','みずま')+R('鉄道','てつどう'), color:'#3EB370' },
-  { id:'wakaden', label:'🐱 '+R('和歌山','わかやま')+R('電鐵','でんてつ'), color:'#EC6D71' },
-  { id:'shigaraki', label:'🦝 '+R('信楽高原','しがらきこうげん')+R('鉄道','てつどう'), color:'#8B6914' },
-  { id:'ohmi', label:'🚃 '+R('近江','おうみ')+R('鉄道','てつどう'), color:'#1E90FF' },
-  { id:'hojo', label:'🚃 '+R('北条','ほうじょう')+R('鉄道','てつどう'), color:'#8B4513' },
-  { id:'tantetsu', label:'🌊 '+R('京都','きょうと')+R('丹後','たんご')+R('鉄道','てつどう'), color:'#2F5597' },
-  { id:'chizu', label:'🚃 '+R('智頭','ちず')+R('急行','きゅうこう'), color:'#9B111E' }
+  { id:'shinkansen', label:'🚅 '+R('新幹線','しんかんせん'), color:'#E60012', region:'both' },
+  { id:'jr', label:'🚄 JR'+R('西日本','にしにほん'), color:'#0068B7', region:'kansai' },
+  { id:'jr_east', label:'🚄 JR'+R('東日本','ひがしにほん'), color:'#00A650', region:'kanto' },
+  { id:'tokyo_metro', label:'🚇 '+R('東京','とうきょう')+'メトロ', color:'#E60012', region:'kanto' },
+  { id:'hankyu', label:'🚃 '+R('阪急','はんきゅう')+R('電鉄','でんてつ'), color:'#814721', region:'kansai' },
+  { id:'hanshin', label:'🐯 '+R('阪神','はんしん')+R('電車','でんしゃ'), color:'#F58220', region:'kansai' },
+  { id:'metro', label:'🚇 '+R('大阪','おおさか')+'メトロ', color:'#E5171F', region:'kansai' },
+  { id:'keihan', label:'🟢 '+R('京阪','けいはん')+R('電車','でんしゃ'), color:'#2B4B36', region:'kansai' },
+  { id:'kintetsu', label:'🦌 '+R('近鉄','きんてつ')+R('電鉄','でんてつ'), color:'#CC4400', region:'kansai' },
+  { id:'nankai', label:'🟩 '+R('南海','なんかい')+R('電鉄','でんてつ'), color:'#009B3E', region:'kansai' },
+  { id:'kyoto_subway', label:'🍃 '+R('京都','きょうと')+R('市営','しえい')+R('地下鉄','ちかてつ'), color:'#3AAF37', region:'kansai' },
+  { id:'kobe_subway', label:'🌳 '+R('神戸','こうべ')+R('市営','しえい')+R('地下鉄','ちかてつ'), color:'#41A62D', region:'kansai' },
+  { id:'keifuku', label:'🟣 '+R('京福','けいふく')+R('電鉄','でんてつ'), color:'#6B3FA0', region:'kansai' },
+  { id:'shintetsu', label:'⛰️ '+R('神戸','こうべ')+R('電鉄','でんてつ'), color:'#008080', region:'kansai' },
+  { id:'osaka_mono', label:'🚝 '+R('大阪','おおさか')+'モノレール', color:'#00A0E9', region:'kansai' },
+  { id:'kobe_nt', label:'✈️ '+R('神戸','こうべ')+R('新交通','しんこうつう'), color:'#00B5E2', region:'kansai' },
+  { id:'sanyo', label:'🔴 '+R('山陽','さんよう')+R('電鉄','でんてつ'), color:'#E60012', region:'kansai' },
+  { id:'eizan', label:'🌿 '+R('叡山','えいざん')+R('電鉄','でんてつ'), color:'#3A913F', region:'kansai' },
+  { id:'nose', label:'🏔️ '+R('能勢','のせ')+R('電鉄','でんてつ'), color:'#F58220', region:'kansai' },
+  { id:'kitakyu', label:'🚇 '+R('北大阪急行','きたおおさかきゅうこう'), color:'#8D0528', region:'kansai' },
+  { id:'hankai', label:'🚊 '+R('阪堺','はんかい')+R('電気軌道','でんききどう'), color:'#F7931E', region:'kansai' },
+  { id:'mizuma', label:'🚃 '+R('水間','みずま')+R('鉄道','てつどう'), color:'#3EB370', region:'kansai' },
+  { id:'wakaden', label:'🐱 '+R('和歌山','わかやま')+R('電鐵','でんてつ'), color:'#EC6D71', region:'kansai' },
+  { id:'shigaraki', label:'🦝 '+R('信楽高原','しがらきこうげん')+R('鉄道','てつどう'), color:'#8B6914', region:'kansai' },
+  { id:'ohmi', label:'🚃 '+R('近江','おうみ')+R('鉄道','てつどう'), color:'#1E90FF', region:'kansai' },
+  { id:'hojo', label:'🚃 '+R('北条','ほうじょう')+R('鉄道','てつどう'), color:'#8B4513', region:'kansai' },
+  { id:'tantetsu', label:'🌊 '+R('京都','きょうと')+R('丹後','たんご')+R('鉄道','てつどう'), color:'#2F5597', region:'kansai' },
+  { id:'chizu', label:'🚃 '+R('智頭','ちず')+R('急行','きゅうこう'), color:'#9B111E', region:'kansai' }
 ];
 
 function buildTitleScreen() {
@@ -1758,6 +1832,8 @@ function buildTitleScreen() {
 
   for (var g = 0; g < GROUPS.length; g++) {
     (function(group) {
+      var gr = group.region || 'kansai';
+      if (gr !== 'both' && gr !== currentRegion) return;
       var groupLines = [];
       for (var i = 0; i < LINES.length; i++) {
         if (LINES[i].group === group.id) groupLines.push(LINES[i]);
@@ -1864,7 +1940,7 @@ function showRouteMap(line) {
     var h = stationRuby(ds[i]);
     if (isLoop) {
       if (isFirst) h += '<span class="terminal-tag" style="background:'+line.color+';">'+R('始発','しはつ')+'</span>';
-      if (isLast) h += '<span class="loop-tag">→ '+R('大阪','おおさか')+'へ</span>';
+      if (isLast) h += '<span class="loop-tag">→ '+stationRuby(ds[0])+'へ</span>';
     } else {
       if (isFirst) h += '<span class="terminal-tag" style="background:'+line.color+';">'+R('始発','しはつ')+'</span>';
       if (isLast) h += '<span class="terminal-tag" style="background:'+line.color+';">'+R('終着','しゅうちゃく')+'</span>';
