@@ -17,6 +17,21 @@
   ruby { ruby-align: center; }
   rt { font-size: 0.5em; font-weight: 700; color: #999; }
 
+  .station-sign {
+    display: inline-block; text-align: center; line-height: 1.2;
+  }
+  .station-sign .st-ja { display: block; font-weight: 900; }
+  .station-sign .st-sub {
+    display: -webkit-flex; display: flex;
+    -webkit-justify-content: center; justify-content: center;
+    -webkit-align-items: baseline; align-items: baseline;
+    gap: 6px; margin-top: 3px; font-size: 0.42em; font-weight: 700; color: #777;
+  }
+  .station-sign .st-e {
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-style: italic; font-weight: 600; color: #999; font-size: 0.95em;
+  }
+
 .sky-gradient {
 position: fixed; top: 0; left: 0; right: 0; height: 180px;
 background: -webkit-linear-gradient(top, #87CEEB 0%, #B6E3F4 60%, #FFF8EC 100%);
@@ -159,7 +174,12 @@ line-height: 1.6;
 .search-modal-item .sm-line{
   font-size:10px;color:#888;font-weight:500;white-space:nowrap;
 }
-.search-modal-item .sm-reading{font-size:12px;color:#888;font-weight:500;margin-left:auto;}
+.search-modal-item .sm-reading{
+  display:-webkit-flex;display:flex;-webkit-flex-direction:column;flex-direction:column;
+  -webkit-align-items:flex-end;align-items:flex-end;gap:2px;margin-left:auto;text-align:right;
+}
+.search-modal-item .sm-h{font-size:12px;color:#666;font-weight:600;}
+.search-modal-item .sm-e{font-size:11px;color:#999;font-style:italic;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:600;}
 .search-modal-item .sm-dot{
   width:10px;height:10px;border-radius:50%;flex-shrink:0;-webkit-flex-shrink:0;
 }
@@ -215,8 +235,8 @@ width: 22px; height: 22px;
 box-shadow: 0 0 0 3px white, 0 0 0 5px currentColor;
 }
 .route-connector { width: 4px; height: 22px; -webkit-flex-shrink: 0; flex-shrink: 0; }
-.route-station-name { font-size: 17px; font-weight: 900; color: #2C1810; line-height: 1.5; -webkit-flex: 1; flex: 1; }
-.route-station-name rt { font-size: 0.5em; color: #999; }
+.route-station-name { font-size: 17px; font-weight: 900; color: #2C1810; line-height: 1.35; -webkit-flex: 1; flex: 1; }
+.route-station-name .station-sign .st-sub { font-size: 0.48em; }
 .route-station-name.terminal-name { font-size: 20px; }
 .terminal-tag {
 display: inline-block; font-size: 10px; font-weight: 700;
@@ -268,9 +288,9 @@ gap: 0;
 text-align: center; padding: 8px 0; width: 100%;
 }
 .flow-station-name {
-font-size: 22px; font-weight: 900; color: #2C1810; line-height: 1.5;
+font-size: 22px; font-weight: 900; color: #2C1810; line-height: 1.3;
 }
-.flow-station-name rt { font-size: 0.45em; color: #999; }
+.flow-station-name .station-sign .st-sub { font-size: 0.4em; }
 .flow-arrow {
 font-size: 20px; color: #CCC; padding: 2px 0; display: block; text-align: center;
 }
@@ -284,11 +304,16 @@ color: #E85D3A;
 background: #FFF5F0;
 min-width: 140px;
 }
+.flow-blank.revealed-correct .station-sign,
+.flow-blank.revealed-wrong .station-sign { font-size: 18px; }
+.flow-blank.revealed-correct .station-sign .st-sub,
+.flow-blank.revealed-wrong .station-sign .st-sub { font-size: 0.38em; }
 .flow-blank.revealed-correct {
 border-color: #4CAF50; background: #E8F5E9; color: #4CAF50;
 border-style: solid;
 }
-.flow-blank.revealed-correct rt { color: #81C784; }
+.flow-blank.revealed-correct .station-sign .st-sub,
+.flow-blank.revealed-correct .station-sign .st-e { color: #81C784; }
 .flow-blank.revealed-wrong {
 border-color: #FF6B6B; background: #FFEBEE; color: #FF6B6B;
 border-style: solid; text-decoration: line-through;
@@ -297,7 +322,7 @@ border-style: solid; text-decoration: line-through;
 display: block; font-size: 18px; font-weight: 700; color: #4CAF50;
 margin-top: 4px;
 }
-.flow-correct-show rt { color: #81C784; }
+.flow-correct-show .station-sign .st-e { color: #81C784; }
 
 /* Answer Buttons - 2 choices */
 .answers-2 {
@@ -313,17 +338,20 @@ box-shadow: 0 5px 0 #D0D0D0, 0 5px 15px rgba(0,0,0,0.1);
 min-height: 80px; line-height: 1.5; text-align: center;
 -webkit-transition: all 0.15s ease; transition: all 0.15s ease;
 }
-.answer-btn-2 rt { font-size: 0.45em; color: #999; }
+.answer-btn-2 .station-sign .st-sub { color: rgba(44,24,16,0.75); }
+.answer-btn-2 .station-sign .st-e { color: rgba(44,24,16,0.65); }
 .answer-btn-2.correct {
 background: #4CAF50; color: white;
 box-shadow: 0 5px 0 #388E3C, 0 5px 15px rgba(76,175,80,0.3);
 }
-.answer-btn-2.correct rt { color: rgba(255,255,255,0.75); }
+.answer-btn-2.correct .station-sign .st-sub,
+.answer-btn-2.correct .station-sign .st-e { color: rgba(255,255,255,0.85); }
 .answer-btn-2.wrong {
 background: #FF6B6B; color: white;
 box-shadow: 0 5px 0 #D32F2F, 0 5px 15px rgba(255,107,107,0.3);
 }
-.answer-btn-2.wrong rt { color: rgba(255,255,255,0.75); }
+.answer-btn-2.wrong .station-sign .st-sub,
+.answer-btn-2.wrong .station-sign .st-e { color: rgba(255,255,255,0.85); }
 .answer-btn-2.disabled { opacity: 0.6; }
 
 .choose-label {
@@ -463,8 +491,10 @@ line-height: 1.6;
   </div>
 </div>
 
+<script src="kana-romaji.js"></script>
 <script>
 function R(k,f){ return '<ruby>'+k+'<rt>'+f+'</rt></ruby>'; }
+var toHiragana = KanaRomaji.toHiragana;
 
 var LINES = [
   {
@@ -2995,8 +3025,14 @@ function buildTitleScreen() {
   }
 }
 
-function stationRuby(st) {
-  return '<ruby>' + st[0] + '<rt>' + st[1] + '</rt></ruby>';
+function stationSignHtml(st) {
+  var kr = KanaRomaji;
+  var hira = st[1] || '';
+  var rom = kr.capitalizeStationEn(kr.stationRomajiFromReading(hira, st.length >= 3 ? st[2] : ''));
+  return '<span class="station-sign">' +
+    '<span class="st-ja">' + kr.escHtml(st[0]) + '</span>' +
+    '<span class="st-sub"><span class="st-h">' + kr.escHtml(hira) + '</span><span class="st-e">' + kr.escHtml(rom) + '</span></span>' +
+    '</span>';
 }
 
 function getUnique(line) {
@@ -3021,7 +3057,7 @@ function showRouteMap(line) {
   } else {
     info.innerHTML = line.companyHtml + ' ／ ' + line.nameHtml + '<br>' +
       '<span class="info-count">' + count + '</span> ' + R('駅','えき') + '　' +
-      stationRuby(ds[0]) + ' ↔ ' + stationRuby(ds[count-1]);
+      stationSignHtml(ds[0]) + ' ↔ ' + stationSignHtml(ds[count-1]);
   }
 
   var list = document.getElementById('routeList');
@@ -3049,10 +3085,10 @@ function showRouteMap(line) {
 
     var nm = document.createElement('div');
     nm.className = 'route-station-name' + (isTerm ? ' terminal-name' : '');
-    var h = stationRuby(ds[i]);
+    var h = stationSignHtml(ds[i]);
     if (isLoop) {
       if (isFirst) h += '<span class="terminal-tag" style="background:'+line.color+';">'+R('始発','しはつ')+'</span>';
-      if (isLast) h += '<span class="loop-tag">→ '+stationRuby(ds[0])+'へ</span>';
+      if (isLast) h += '<span class="loop-tag">→ '+stationSignHtml(ds[0])+'へ</span>';
     } else {
       if (isFirst) h += '<span class="terminal-tag" style="background:'+line.color+';">'+R('始発','しはつ')+'</span>';
       if (isLast) h += '<span class="terminal-tag" style="background:'+line.color+';">'+R('終着','しゅうちゃく')+'</span>';
@@ -3128,7 +3164,7 @@ function showQuestion() {
     if (i === seg.blankPos) {
       html += '<div class="flow-item"><div class="flow-blank" id="blankSlot">❓</div></div>';
     } else {
-      html += '<div class="flow-item"><div class="flow-station-name">' + stationRuby(seg.stations[i]) + '</div></div>';
+      html += '<div class="flow-item"><div class="flow-station-name">' + stationSignHtml(seg.stations[i]) + '</div></div>';
     }
   }
 
@@ -3147,7 +3183,7 @@ function showQuestion() {
     (function(ch) {
       var btn = document.createElement('button');
       btn.className = 'answer-btn-2';
-      btn.innerHTML = stationRuby(ch);
+      btn.innerHTML = stationSignHtml(ch);
       btn.setAttribute('data-key', ch[0]);
       btn.onclick = function() { handleAnswer(btn, ch); };
       ad.appendChild(btn);
@@ -3183,18 +3219,18 @@ function handleAnswer(btn, chosen) {
     showFeedback('🎊');
     // Fill in blank with correct answer
     blank.className = 'flow-blank revealed-correct';
-    blank.innerHTML = stationRuby(correct);
+    blank.innerHTML = stationSignHtml(correct);
   } else {
     btn.className += ' wrong';
     playWrongSound();
     showFeedback('😢');
     // Show what they picked (wrong) then show correct
     blank.className = 'flow-blank revealed-wrong';
-    blank.innerHTML = stationRuby(chosen);
+    blank.innerHTML = stationSignHtml(chosen);
     // Show correct below
     var correctShow = document.createElement('div');
     correctShow.className = 'flow-correct-show';
-    correctShow.innerHTML = '→ ' + stationRuby(correct);
+    correctShow.innerHTML = '→ ' + stationSignHtml(correct);
     blank.parentNode.appendChild(correctShow);
     // Also highlight correct button
     for (var i = 0; i < btns.length; i++) {
@@ -3243,12 +3279,6 @@ document.getElementById('homeBtn').onclick = function() { showScreen('titleScree
 buildTitleScreen();
 
 // ===== Station Search =====
-function toHiragana(str){
-  return str.replace(/[\u30A1-\u30F6]/g,function(c){
-    return String.fromCharCode(c.charCodeAt(0)-0x60);
-  });
-}
-
 function getAllStations(){
   var map={};
   for(var i=0;i<LINES.length;i++){
@@ -3257,7 +3287,9 @@ function getAllStations(){
       var name=ln.stations[j][0];
       var reading=ln.stations[j][1];
       if(!map[name]){
-        map[name]={name:name,reading:reading,lines:[],colors:[]};
+        var exRom = ln.stations[j].length >= 3 ? ln.stations[j][2] : '';
+        var romaji = KanaRomaji.capitalizeStationEn(KanaRomaji.stationRomajiFromReading(reading, exRom));
+        map[name]={name:name,reading:reading,romaji:romaji,lines:[],colors:[]};
       }
       var lineName=ln.nameHtml.replace(/<ruby>|<\/ruby>|<rt>.*?<\/rt>/g,'');
       if(map[name].lines.indexOf(lineName)<0){
@@ -3276,12 +3308,14 @@ var allStations=getAllStations();
 function searchStationsTop(query){
   if(!query) return [];
   var q=toHiragana(query.toLowerCase());
+  var qLo=query.toLowerCase();
   var results=[];
   for(var i=0;i<allStations.length;i++){
     var s=allStations[i];
     var nameMatch=s.name.indexOf(query)>=0;
     var readingMatch=s.reading&&toHiragana(s.reading).indexOf(q)>=0;
-    if(nameMatch||readingMatch){
+    var romMatch=s.romaji&&s.romaji.toLowerCase().indexOf(qLo)>=0;
+    if(nameMatch||readingMatch||romMatch){
       results.push(s);
     }
   }
@@ -3314,7 +3348,7 @@ function renderSearchResults(results){
     html+='<span class="sm-dot" style="background:'+s.colors[0]+';"></span>';
     html+='<span>'+s.name+'</span>';
     html+='<span class="sm-line">'+s.lines.join(', ')+'</span>';
-    html+='<span class="sm-reading">'+s.reading+'</span>';
+    html+='<span class="sm-reading"><span class="sm-h">'+KanaRomaji.escHtml(s.reading)+'</span><span class="sm-e">'+KanaRomaji.escHtml(s.romaji)+'</span></span>';
     html+='</div>';
   }
   box.innerHTML=html;

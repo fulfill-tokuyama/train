@@ -11,6 +11,16 @@
 html,body{width:100%;height:100%;overflow:hidden;font-family:'Hiragino Kaku Gothic ProN','Yu Gothic','Meiryo',sans-serif;background:#E8EDF2;}
 ruby{ruby-align:center;}
 rt{font-size:0.55em;font-weight:700;color:#888;}
+.map-st-root{text-align:center;line-height:1.12;font-family:'Hiragino Kaku Gothic ProN','Yu Gothic','Meiryo',sans-serif;-webkit-user-select:none;user-select:none;}
+.map-st-root .map-st-k{font-size:10px;font-weight:900;color:#2C1810;}
+.map-st-root .map-st-sub{display:-webkit-flex;display:flex;-webkit-justify-content:center;justify-content:center;-webkit-align-items:baseline;align-items:baseline;gap:5px;font-size:7px;font-weight:700;color:#444;margin-top:1px;}
+.map-st-root .map-st-e{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-style:italic;font-weight:600;color:#666;font-size:6.5px;}
+.map-st-root.major .map-st-k{font-size:11.5px;}
+.map-st-root.major .map-st-sub{font-size:7.5px;}
+.map-st-root.major .map-st-e{font-size:7px;}
+.sr-reading{display:-webkit-flex;display:flex;-webkit-flex-direction:column;flex-direction:column;-webkit-align-items:flex-end;align-items:flex-end;gap:1px;}
+.sr-reading .sr-hira{font-size:11px;color:#666;font-weight:600;}
+.sr-reading .sr-roma{font-size:10px;color:#888;font-style:italic;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:600;}
 
 .top-bar{
   position:fixed;top:0;left:0;right:0;z-index:100;
@@ -136,8 +146,10 @@ svg .station-label.dimmed{opacity:0.15;}
 <div class="legend-panel" id="legendPanel"></div>
 <div class="hint" id="hint">☝️ ピンチで拡大・ドラッグで移動</div>
 
+<script src="kana-romaji.js"></script>
 <script>
 function R(k,f){return '<ruby>'+k+'<rt>'+f+'</rt></ruby>';}
+var toHiragana=KanaRomaji.toHiragana;
 
 var STATIONS = {
   himeji:{x:40,y:355,n:'姫路',r:'ひめじ'},
@@ -784,8 +796,6 @@ function renderMap(){
     var s=STATIONS[sid];
     if(!s.major&&!isJunction(sid)) continue;
     var cls='station-label'+(highlightGroup&&!isInGroup(sid,highlightGroup)?' dimmed':'');
-    var fs=s.major?11:8.5;
-    var fw=s.major?900:700;
     var dy=s.major?-10:-7;
     if(sid==='shin_osaka'||sid==='esaka'||sid==='dainichi'||sid==='kokusaikaikan'||sid==='sasayamaguchi'||sid==='seishin_chuo'||sid==='arashiyama'||sid==='himeji'||sid==='kitano_hakubaicho'||sid==='wadayama'||sid==='niimi'||sid==='osaka_airport'||sid==='saito_nishi'||sid==='senri_chuo'||sid==='banpaku')dy=-7;
     if(sid==='shin_kobe')dy=-6;
@@ -795,7 +805,17 @@ function renderMap(){
     if(sid==='banshu_ako'||sid==='sanyo_aboshi'||sid==='shingu'||sid==='kushimoto'||sid==='shirahama'||sid==='gobo'||sid==='kishi'||sid==='kada'||sid==='gokurakubashi'||sid==='marine_park'||sid==='hojocho'||sid==='izumi_chuo'||sid==='mizuma_kannon'||sid==='hamadera'||sid==='kaizuka'||sid==='minoo_kayano')dy=14;
     if(sid==='kamigori')dy=14;
     if(sid==='chizu_st')dy=-7;
-    html+='<text class="'+cls+'" x="'+s.x+'" y="'+(s.y+dy)+'" text-anchor="middle" font-size="'+fs+'" font-weight="'+fw+'" fill="#2C1810">'+s.n+'</text>';
+    var foW=s.major?128:112;
+    var foH=s.major?42:36;
+    var foX=s.x-foW/2;
+    var foY=s.y+dy-foH+6;
+    var rom=KanaRomaji.capitalizeStationEn(KanaRomaji.stationRomajiFromReading(s.r,s.e));
+    var rootCls='map-st-root'+(s.major?' major':'');
+    html+='<foreignObject class="'+cls+'" x="'+foX+'" y="'+foY+'" width="'+foW+'" height="'+foH+'">'+
+      '<div xmlns="http://www.w3.org/1999/xhtml" class="'+rootCls+'">'+
+      '<div class="map-st-k">'+KanaRomaji.escHtml(s.n)+'</div>'+
+      '<div class="map-st-sub"><span class="map-st-h">'+KanaRomaji.escHtml(s.r)+'</span><span class="map-st-e">'+KanaRomaji.escHtml(rom)+'</span></div>'+
+      '</div></foreignObject>';
   }
 
   svg.innerHTML=html;
@@ -977,21 +997,18 @@ function clearHighlight(){
   }
 }
 
-function toHiragana(str){
-  return str.replace(/[\u30A1-\u30F6]/g,function(c){
-    return String.fromCharCode(c.charCodeAt(0)-0x60);
-  });
-}
-
 function searchStations(query){
   var results=[];
   if(!query) return results;
   var q=toHiragana(query.toLowerCase());
+  var qLo=query.toLowerCase();
   for(var sid in STATIONS){
     var s=STATIONS[sid];
     var nameMatch=s.n.indexOf(query)>=0;
     var readingMatch=s.r&&toHiragana(s.r).indexOf(q)>=0;
-    if(nameMatch||readingMatch){
+    var rom=KanaRomaji.stationRomajiFromReading(s.r,s.e);
+    var romMatch=rom&&rom.toLowerCase().indexOf(qLo)>=0;
+    if(nameMatch||readingMatch||romMatch){
       results.push({id:sid,station:s});
     }
   }
@@ -1047,7 +1064,8 @@ function doSearch(){
     html+='<div class="search-result-item" data-sid="'+r.id+'">';
     html+='<span class="sr-dot"></span>';
     html+='<span>'+r.station.n+'</span>';
-    html+='<span class="sr-reading">'+r.station.r+'</span>';
+    var sr=KanaRomaji.capitalizeStationEn(KanaRomaji.stationRomajiFromReading(r.station.r,r.station.e));
+    html+='<span class="sr-reading"><span class="sr-hira">'+KanaRomaji.escHtml(r.station.r)+'</span><span class="sr-roma">'+KanaRomaji.escHtml(sr)+'</span></span>';
     html+='</div>';
   }
   box.innerHTML=html;
