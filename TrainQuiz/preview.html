@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>iOS Preview - でんしゃクイズ</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; font-family:-apple-system,BlinkMacSystemFont,'Hiragino Kaku Gothic ProN','Yu Gothic',sans-serif; background:#1a1a1a; display:flex; justify-content:center; align-items:center; }
+
+.iphone-frame {
+  width:390px; height:844px; background:#FFF8EC; border-radius:44px; overflow:hidden;
+  position:relative; box-shadow:0 20px 60px rgba(0,0,0,0.5); border:6px solid #1a1a1a;
+}
+.iphone-notch {
+  position:absolute; top:0; left:50%; transform:translateX(-50%);
+  width:126px; height:34px; background:#1a1a1a; border-radius:0 0 20px 20px; z-index:100;
+}
+.iphone-home {
+  position:absolute; bottom:8px; left:50%; transform:translateX(-50%);
+  width:134px; height:5px; background:#333; border-radius:3px; z-index:100;
+}
+
+.screen { width:100%; height:100%; overflow-y:auto; overflow-x:hidden; position:relative; }
+
+/* Sky gradient */
+.sky { position:absolute; top:0; left:0; right:0; height:200px;
+  background:linear-gradient(180deg, #87CEEB 0%, #B6E3F4 60%, #FFF8EC 100%); z-index:0; }
+
+.ground {
+  position:sticky; bottom:0; left:0; right:0; z-index:50;
+}
+.track { height:10px; background:#8B6914; }
+.grass { height:40px; background:linear-gradient(to bottom, #7EC850, #5BA03A); }
+
+.content { position:relative; z-index:10; padding:50px 16px 100px; }
+
+/* Title */
+.title-area { text-align:center; padding:20px 0 12px; }
+.title-emoji { font-size:56px; }
+.title-logo { font-size:22px; font-weight:900; color:#2C1810; }
+.title-sub { font-size:16px; font-weight:700; color:#E85D3A; margin:4px 0; }
+.title-main { font-size:34px; font-weight:900; color:#E85D3A; letter-spacing:2px; }
+
+/* Region picker */
+.picker { display:flex; border-radius:14px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.1); margin-bottom:12px; }
+.picker-btn { flex:1; border:none; padding:12px 4px; font-size:13px; font-weight:900;
+  cursor:pointer; background:white; color:#999; font-family:inherit; }
+.picker-btn.active { background:#0068B7; color:white; }
+
+/* Mode picker */
+.mode-picker { display:flex; border-radius:14px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.1); margin-bottom:16px; }
+.mode-btn { flex:1; border:none; padding:14px 8px; font-size:15px; font-weight:900;
+  cursor:pointer; background:white; color:#999; font-family:inherit; }
+.mode-btn.active { background:#E85D3A; color:white; }
+
+/* Search button */
+.search-btn { display:block; margin:0 auto 16px; background:#3A7BE8; color:white; border:none;
+  border-radius:14px; padding:12px 24px; font-size:15px; font-weight:900; font-family:inherit;
+  box-shadow:0 4px 0 rgba(0,0,0,0.2),0 6px 12px rgba(0,0,0,0.15); cursor:pointer; }
+
+/* Company group */
+.company-header { display:flex; align-items:center; gap:8px; padding:10px 14px; margin-bottom:8px;
+  border-radius:14px; color:white; font-weight:900; font-size:14px; width:100%; border:none;
+  font-family:inherit; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+.company-header .arrow { margin-left:auto; font-size:12px; opacity:0.8; transition:transform 0.2s; }
+.company-header .arrow.open { transform:rotate(90deg); }
+
+/* Line buttons */
+.line-grid { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; padding:0 4px; margin-bottom:14px; }
+.line-btn { width:30%; min-width:100px; border:none; border-radius:14px; padding:10px 4px;
+  font-family:inherit; font-size:11px; font-weight:700; color:white; cursor:pointer;
+  box-shadow:0 4px 0 rgba(0,0,0,0.2),0 6px 12px rgba(0,0,0,0.15); text-align:center; }
+.line-btn .icon { font-size:22px; display:block; margin-bottom:2px; }
+
+/* ===== Quiz Screen ===== */
+.quiz-screen { display:none; }
+.quiz-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.line-badge { font-size:13px; font-weight:900; color:white; padding:6px 14px; border-radius:20px; display:inline-block; }
+.score { font-size:18px; font-weight:900; color:#E85D3A; }
+.progress { text-align:center; font-size:13px; font-weight:700; color:#888; margin-bottom:12px; }
+
+.flow-card { background:#F5F0E8; border-radius:20px; padding:16px; box-shadow:0 4px 16px rgba(0,0,0,0.1); margin-bottom:16px; }
+.flow-title { text-align:center; font-size:14px; font-weight:900; color:#2C1810; margin-bottom:12px; }
+.flow-stations { display:flex; flex-direction:column; align-items:center; gap:4px; }
+.flow-station { background:white; border-radius:10px; padding:8px 16px; box-shadow:0 1px 4px rgba(0,0,0,0.05); text-align:center; }
+.flow-station .st-name { font-size:20px; font-weight:900; }
+.flow-station .st-sub { display:flex; gap:4px; justify-content:center; font-size:9px; font-weight:700; color:#777; margin-top:2px; }
+.flow-station .st-e { font-style:italic; color:#999; }
+.flow-arrow { color:rgba(0,0,0,0.2); font-size:12px; }
+.flow-blank { border:3px dashed #E85D3A; border-radius:10px; padding:10px 24px; font-size:28px; }
+.flow-blank.correct { background:#D4EDDA; border:none; }
+
+.answers { display:flex; gap:12px; }
+.answer-btn { flex:1; background:white; border:none; border-radius:16px; padding:14px 8px;
+  box-shadow:0 4px 0 rgba(0,0,0,0.1),0 6px 12px rgba(0,0,0,0.1); cursor:pointer; text-align:center;
+  font-family:inherit; }
+.answer-btn .st-name { font-size:18px; font-weight:900; }
+.answer-btn .st-sub { display:flex; gap:4px; justify-content:center; font-size:8px; font-weight:700; color:#777; margin-top:2px; }
+.answer-btn .st-e { font-style:italic; color:#999; }
+.answer-btn.correct { background:#D4EDDA; }
+.answer-btn.wrong { background:#F8D7DA; }
+
+/* Result screen */
+.result-screen { display:none; text-align:center; padding-top:60px; }
+.result-emoji { font-size:80px; margin-bottom:8px; }
+.result-title { font-size:28px; font-weight:900; color:#2C1810; margin-bottom:8px; }
+.result-stars { font-size:36px; margin-bottom:8px; }
+.result-score { font-size:32px; font-weight:900; color:#E85D3A; margin-bottom:4px; }
+.result-line { font-size:16px; font-weight:700; color:#888; margin-bottom:24px; }
+.result-buttons { display:flex; gap:12px; justify-content:center; }
+.result-btn { border:none; border-radius:14px; padding:14px 24px; font-size:15px; font-weight:900;
+  color:white; cursor:pointer; font-family:inherit; }
+
+/* Route map screen */
+.route-screen { display:none; }
+.route-header-card { background:white; border-radius:16px; padding:16px; text-align:center;
+  box-shadow:0 2px 12px rgba(0,0,0,0.08); margin-bottom:16px; }
+.route-company { font-size:13px; font-weight:700; color:#888; }
+.route-name { font-size:20px; font-weight:900; color:#2C1810; margin:4px 0; }
+.route-count { font-size:14px; color:#888; }
+.route-count span { font-size:24px; font-weight:900; }
+
+.station-row { display:flex; align-items:center; gap:12px; }
+.station-num { font-size:12px; font-weight:700; color:#888; width:24px; text-align:right; font-variant-numeric:tabular-nums; }
+.station-line-col { display:flex; flex-direction:column; align-items:center; width:20px; }
+.station-connector { width:4px; height:18px; }
+.station-dot { width:16px; height:16px; border-radius:50%; border:3px solid; background:white; }
+.station-dot.terminal { background:currentColor; }
+.station-name-area { flex:1; padding:6px 0; }
+.station-name-area .st-name { font-size:16px; font-weight:900; }
+.station-name-area .st-name.terminal { font-size:18px; }
+.station-name-area .st-sub { display:flex; gap:4px; font-size:8px; font-weight:700; color:#777; margin-top:1px; }
+.station-name-area .st-e { font-style:italic; color:#999; }
+.terminal-tag { font-size:10px; font-weight:900; color:white; padding:2px 8px; border-radius:10px; margin-left:6px; display:inline-block; vertical-align:middle; }
+
+/* Back bar */
+.back-bar { position:sticky; top:0; left:0; right:0; z-index:90; background:rgba(255,248,236,0.95);
+  backdrop-filter:blur(8px); padding:50px 16px 10px; display:flex; align-items:center; gap:8px; }
+.back-btn { background:none; border:none; font-size:18px; font-weight:900; color:#0068B7; cursor:pointer; font-family:inherit; }
+
+/* Nav tabs for demo */
+.demo-tabs { position:fixed; bottom:60px; left:50%; transform:translateX(-50%); z-index:200;
+  display:flex; gap:8px; background:rgba(0,0,0,0.8); padding:6px 12px; border-radius:20px; }
+.demo-tab { border:none; background:rgba(255,255,255,0.2); color:white; padding:6px 14px;
+  border-radius:14px; font-size:12px; font-weight:700; cursor:pointer; font-family:inherit; }
+.demo-tab.active { background:#E85D3A; }
+</style>
+</head>
+<body>
+
+<div class="demo-tabs">
+  <button class="demo-tab active" onclick="showDemo('title')">タイトル</button>
+  <button class="demo-tab" onclick="showDemo('quiz')">クイズ</button>
+  <button class="demo-tab" onclick="showDemo('result')">けっか</button>
+  <button class="demo-tab" onclick="showDemo('route')">ろせんず</button>
+</div>
+
+<div class="iphone-frame">
+  <div class="iphone-notch"></div>
+  <div class="iphone-home"></div>
+  <div class="screen" id="mainScreen">
+
+    <!-- ===== TITLE SCREEN ===== -->
+    <div class="title-screen-wrap" id="titleScreen">
+      <div class="sky"></div>
+      <div class="content">
+        <div class="title-area">
+          <div class="title-emoji">🚃</div>
+          <div class="title-logo">つぎのえきは？</div>
+          <div class="title-sub">〜 関西版 〜</div>
+          <div class="title-main">でんしゃクイズ</div>
+        </div>
+
+        <div class="picker">
+          <button class="picker-btn active">かんさい</button>
+          <button class="picker-btn">かんとう</button>
+          <button class="picker-btn">しんかんせん</button>
+        </div>
+
+        <div class="mode-picker">
+          <button class="mode-btn active">🎯 えきめいクイズ</button>
+          <button class="mode-btn">📋 ろせんず</button>
+        </div>
+
+        <button class="search-btn">🔍 えきをさがす</button>
+
+        <!-- JR西日本 -->
+        <button class="company-header" style="background:#0068B7;">
+          🚄 JR西日本
+          <span class="arrow open">▶</span>
+        </button>
+        <div class="line-grid">
+          <button class="line-btn" style="background:#0068B7;"><span class="icon">🔵</span>東海道・山陽本線</button>
+          <button class="line-btn" style="background:#FF6600;"><span class="icon">🟠</span>大阪環状線</button>
+          <button class="line-btn" style="background:#00A650;"><span class="icon">🟢</span>関西本線</button>
+          <button class="line-btn" style="background:#FF69B4;"><span class="icon">🌸</span>桜島線</button>
+          <button class="line-btn" style="background:#814721;"><span class="icon">🟤</span>福知山線</button>
+          <button class="line-btn" style="background:#00A2E8;"><span class="icon">🔵</span>阪和線</button>
+        </div>
+
+        <!-- 阪急電鉄 -->
+        <button class="company-header" style="background:#814721;">
+          🚃 阪急電鉄
+          <span class="arrow open">▶</span>
+        </button>
+        <div class="line-grid">
+          <button class="line-btn" style="background:#814721;"><span class="icon">🟤</span>神戸線</button>
+          <button class="line-btn" style="background:#814721;"><span class="icon">🟤</span>宝塚線</button>
+          <button class="line-btn" style="background:#814721;"><span class="icon">🟤</span>京都線</button>
+        </div>
+
+        <!-- 大阪メトロ -->
+        <button class="company-header" style="background:#E5171F;">
+          🚇 大阪メトロ
+          <span class="arrow open">▶</span>
+        </button>
+        <div class="line-grid">
+          <button class="line-btn" style="background:#E60012;"><span class="icon">🔴</span>御堂筋線</button>
+          <button class="line-btn" style="background:#522886;"><span class="icon">🟣</span>谷町線</button>
+          <button class="line-btn" style="background:#0068B7;"><span class="icon">🔵</span>四つ橋線</button>
+          <button class="line-btn" style="background:#00A650;"><span class="icon">🟢</span>中央線</button>
+          <button class="line-btn" style="background:#E44D93;"><span class="icon">🩷</span>千日前線</button>
+          <button class="line-btn" style="background:#F58220;"><span class="icon">🟠</span>堺筋線</button>
+        </div>
+
+      </div>
+      <div class="ground"><div class="track"></div><div class="grass"></div></div>
+    </div>
+
+    <!-- ===== QUIZ SCREEN ===== -->
+    <div class="quiz-screen" id="quizScreen">
+      <div class="sky"></div>
+      <div class="content">
+        <div class="quiz-header">
+          <span class="line-badge" style="background:#FF6600;">大阪環状線</span>
+          <span class="score">⭐ 3</span>
+        </div>
+        <div class="progress">4 / 10 もんめ</div>
+
+        <div class="flow-card">
+          <div class="flow-title">えきの じゅんばん 🚃</div>
+          <div class="flow-stations">
+            <div class="flow-station">
+              <div class="st-name">天王寺</div>
+              <div class="st-sub"><span>てんのうじ</span><span class="st-e">Tennoji</span></div>
+            </div>
+            <div class="flow-arrow">▼</div>
+            <div class="flow-station">
+              <div class="st-name">新今宮</div>
+              <div class="st-sub"><span>しんいまみや</span><span class="st-e">Shin-Imamiya</span></div>
+            </div>
+            <div class="flow-arrow">▼</div>
+            <div class="flow-blank">❓</div>
+            <div class="flow-arrow">▼</div>
+            <div class="flow-station">
+              <div class="st-name">大正</div>
+              <div class="st-sub"><span>たいしょう</span><span class="st-e">Taisho</span></div>
+            </div>
+            <div class="flow-arrow">▼</div>
+            <div class="flow-station">
+              <div class="st-name">弁天町</div>
+              <div class="st-sub"><span>べんてんちょう</span><span class="st-e">Bentencho</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="answers">
+          <button class="answer-btn">
+            <div class="st-name">芦原橋</div>
+            <div class="st-sub"><span>あしはらばし</span><span class="st-e">Ashiharabashi</span></div>
+          </button>
+          <button class="answer-btn">
+            <div class="st-name">今宮</div>
+            <div class="st-sub"><span>いまみや</span><span class="st-e">Imamiya</span></div>
+          </button>
+        </div>
+      </div>
+      <div class="ground"><div class="track"></div><div class="grass"></div></div>
+    </div>
+
+    <!-- ===== RESULT SCREEN ===== -->
+    <div class="result-screen" id="resultScreen">
+      <div class="sky"></div>
+      <div class="content" style="padding-top:80px;">
+        <div class="result-emoji">🎉</div>
+        <div class="result-title">すごーい！</div>
+        <div class="result-stars">⭐⭐⭐</div>
+        <div class="result-score">8 / 10</div>
+        <div class="result-line">大阪環状線 クイズ</div>
+        <div class="result-buttons">
+          <button class="result-btn" style="background:#E85D3A;">🔄 もういちど</button>
+          <button class="result-btn" style="background:#0068B7;">🏠 もどる</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ROUTE MAP SCREEN ===== -->
+    <div class="route-screen" id="routeScreen">
+      <div class="back-bar">
+        <button class="back-btn">＜</button>
+        <span class="line-badge" style="background:#FF6600; font-size:13px;">大阪環状線</span>
+      </div>
+      <div class="content" style="padding-top:10px;">
+        <div class="route-header-card">
+          <div class="route-company">JR西日本</div>
+          <div class="route-name">大阪環状線</div>
+          <div class="route-count"><span style="color:#FF6600;">19</span> えき　🔄 かんじょう</div>
+        </div>
+
+        <div id="routeStations"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+var routeData = [
+  ['大阪','おおさか','Osaka',true],
+  ['福島','ふくしま','Fukushima',false],
+  ['野田','のだ','Noda',false],
+  ['西九条','にしくじょう','Nishikujo',false],
+  ['弁天町','べんてんちょう','Bentencho',false],
+  ['大正','たいしょう','Taisho',false],
+  ['芦原橋','あしはらばし','Ashiharabashi',false],
+  ['今宮','いまみや','Imamiya',false],
+  ['新今宮','しんいまみや','Shin-Imamiya',false],
+  ['天王寺','てんのうじ','Tennoji',false],
+  ['寺田町','てらだちょう','Teradacho',false],
+  ['桃谷','ももだに','Momodani',false],
+  ['鶴橋','つるはし','Tsuruhashi',false],
+  ['玉造','たまつくり','Tamatsukuri',false],
+  ['森ノ宮','もりのみや','Morinomiya',false],
+  ['大阪城公園','おおさかじょうこうえん','Osakajokoen',false],
+  ['京橋','きょうばし','Kyobashi',false],
+  ['桜ノ宮','さくらのみや','Sakuranomiya',false],
+  ['天満','てんま','Tenma',true],
+];
+
+function buildRoute() {
+  var el = document.getElementById('routeStations');
+  var html = '';
+  var color = '#FF6600';
+  for (var i = 0; i < routeData.length; i++) {
+    var s = routeData[i];
+    var isFirst = i === 0, isLast = i === routeData.length - 1;
+    var isTerm = isFirst || isLast;
+    html += '<div class="station-row">';
+    html += '<div class="station-num">' + (i+1) + '</div>';
+    html += '<div class="station-line-col">';
+    html += '<div class="station-connector" style="background:' + (isFirst ? 'transparent' : color) + ';"></div>';
+    html += '<div class="station-dot' + (isTerm ? ' terminal' : '') + '" style="border-color:'+color+';color:'+color+';' + (isTerm ? 'background:'+color+';' : '') + '"></div>';
+    html += '<div class="station-connector" style="background:' + (isLast ? 'transparent' : color) + ';"></div>';
+    html += '</div>';
+    html += '<div class="station-name-area">';
+    html += '<span class="st-name' + (isTerm ? ' terminal' : '') + '">' + s[0] + '</span>';
+    if (isFirst) html += '<span class="terminal-tag" style="background:'+color+';">しはつ</span>';
+    if (isLast) html += '<span class="terminal-tag" style="background:'+color+';">→ 大阪へ</span>';
+    html += '<div class="st-sub"><span>' + s[1] + '</span><span class="st-e">' + s[2] + '</span></div>';
+    html += '</div></div>';
+  }
+  el.innerHTML = html;
+}
+buildRoute();
+
+function showDemo(name) {
+  document.getElementById('titleScreen').style.display = name === 'title' ? '' : 'none';
+  document.getElementById('quizScreen').style.display = name === 'quiz' ? '' : 'none';
+  document.getElementById('resultScreen').style.display = name === 'result' ? '' : 'none';
+  document.getElementById('routeScreen').style.display = name === 'route' ? '' : 'none';
+  document.getElementById('mainScreen').scrollTop = 0;
+  document.querySelectorAll('.demo-tab').forEach(function(t){ t.classList.remove('active'); });
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
