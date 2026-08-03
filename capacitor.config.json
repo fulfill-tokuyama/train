@@ -1,0 +1,14 @@
+{
+  "appId": "com.trainquiz.kansai",
+  "appName": "つぎのえきは？",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "ios": {
+    "contentInset": "always",
+    "allowsLinkPreview": false,
+    "scrollEnabled": false,
+    "backgroundColor": "#FFF8EC"
+  }
+}

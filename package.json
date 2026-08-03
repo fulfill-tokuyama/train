@@ -1,0 +1,20 @@
+{
+  "name": "train",
+  "version": "1.0.0",
+  "description": "電車のゲーム",
+  "main": "index.js",
+  "scripts": {
+    "build": "cp index.html www/index.html",
+    "cap:add": "npx cap add ios",
+    "cap:sync": "npm run build && npx cap sync",
+    "cap:open": "npx cap open ios"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@capacitor/cli": "^8.1.0",
+    "@capacitor/core": "^8.1.0",
+    "@capacitor/ios": "^8.1.0"
+  }
+}
